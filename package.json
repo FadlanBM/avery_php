@@ -1,0 +1,16 @@
+{
+  "name": "php-native-app",
+  "version": "1.0.0",
+  "description": "PHP Native App with Tailwind CSS",
+  "scripts": {
+    "build": "tailwindcss -i ./resources/css/input.css -o ./assets/css/style.css --minify",
+    "watch": "tailwindcss -i ./resources/css/input.css -o ./assets/css/style.css --watch",
+    "vercel-build": "npm run build && mkdir -p public && cp -r assets public/assets"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "tailwindcss": "^3.4.1"
+  }
+}

@@ -1,0 +1,12 @@
+# Protect app directory
+RewriteEngine On
+RewriteRule ^app/.*$ - [F,L]
+
+# Protect .env files
+<FilesMatch "^\.env">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Optional: Disable directory listing
+Options -Indexes

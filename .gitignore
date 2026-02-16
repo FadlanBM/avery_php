@@ -1,0 +1,26 @@
+# Environment Variables
+.env
+.env.local
+.env.backup
+
+# Vendor
+vendor/
+
+# System Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+app/logs/*.log
+*.log
+
+# Temp
+tmp/
+temp/
