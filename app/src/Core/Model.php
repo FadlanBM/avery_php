@@ -53,10 +53,21 @@ abstract class Model
         $columns = implode(', ', array_keys($data));
         $placeholders = ':' . implode(', :', array_keys($data));
         
+        $driver = $this->db->getAttribute(\PDO::ATTR_DRIVER_NAME);
         $sql = "INSERT INTO {$this->table} ({$columns}) VALUES ({$placeholders})";
+        if ($driver === 'pgsql') {
+            $sql .= " RETURNING {$this->primaryKey}";
+        }
         $stmt = $this->db->prepare($sql);
         
         if ($stmt->execute($data)) {
+            if ($driver === 'pgsql') {
+                $id = $stmt->fetchColumn();
+                return $id ?: true;
+            }
+            if (array_key_exists($this->primaryKey, $data)) {
+                return $data[$this->primaryKey];
+            }
             return $this->db->lastInsertId();
         }
         return false;

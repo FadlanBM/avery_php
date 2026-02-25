@@ -1,133 +1,121 @@
-# 🚀 Avery PHP - Sistem Antrean & Booking Real-time
+# My Simple PHP Native Framework (with Booking System)
 
-Selamat datang di **Avery PHP**, sebuah framework PHP Native minimalis yang dirancang khusus untuk menangani sistem antrean dan pemesanan ruangan secara **real-time**. Proyek ini dioptimalkan untuk berjalan di lingkungan **Devilbox** dengan struktur modern.
+Framework PHP Native minimalis dengan struktur modern (MVC-ish) yang dioptimalkan untuk berjalan di **Devilbox**. Proyek ini telah dikembangkan untuk mendukung sistem pemesanan ruangan (Booking System).
 
-## 📋 Daftar Isi
+## 🚀 Fitur Utama
 
-- [🚀 Avery PHP - Sistem Antrean \& Booking Real-time](#-avery-php---sistem-antrean--booking-real-time)
-  - [📋 Daftar Isi](#-daftar-isi)
-  - [✨ Fitur Utama](#-fitur-utama)
-  - [🔄 Alur Aplikasi](#-alur-aplikasi)
-    - [1. Flowchart Pengunjung (Client Side)](#1-flowchart-pengunjung-client-side)
-    - [2. Flowchart Admin (Server Side)](#2-flowchart-admin-server-side)
-    - [3. Sinkronisasi Real-time (Behind the Scenes)](#3-sinkronisasi-real-time-behind-the-scenes)
-  - [📂 Struktur Folder (Devilbox Ready)](#-struktur-folder-devilbox-ready)
-  - [🛠️ Teknologi](#️-teknologi)
+- **Zero Dependency**: Tidak butuh Composer atau library eksternal. Semua _core_ ditulis _native_.
+- **Modern Structure**: Menggunakan konsep _Separation of Concerns_ (Controller, View, Config terpisah).
+- **Environment Variables**: Dukungan file `.env` untuk konfigurasi sensitif.
+- **Eloquent-like Models**: Sistem Model sederhana untuk interaksi database yang lebih mudah (`find`, `where`, `create`, `all`).
+- **Database Migrations**: Sistem version control untuk skema database menggunakan CLI.
+- **Authentication**: Sistem login/register dengan hashing password dan session management.
+- **Logging & Debugging**: Helper `dd()` ala Laravel dan error logging terintegrasi.
+- **Booking System**: Alur kerja lengkap untuk pemesanan ruangan (Cek Ketersediaan, Reservasi, Pembayaran, Check-in).
 
----
-
-## ✨ Fitur Utama
-
-- **Zero Dependency**: Core framework ditulis native tanpa library berat.
-- **Real-time Updates**: Notifikasi instan menggunakan teknologi WebSocket/PubSub.
-- **QR Code Access**: Pengunjung dapat bergabung ke antrean hanya dengan memindai QR.
-- **Admin Dashboard**: Panel kontrol untuk memanggil dan mengelola antrean.
-- **Database Migrations**: Manajemen skema database yang terstruktur.
-
----
-
-## 🔄 Alur Aplikasi
-
-Sistem ini memisahkan logika antara **Pengunjung (Client)** dan **Admin (Server)** untuk memastikan efisiensi dan pengalaman pengguna yang mulus.
-
-### 1. Flowchart Pengunjung (Client Side)
-
-_Perjalanan pengunjung dari mulai datang hingga dipanggil._
-
-```mermaid
-graph TD
-    Start([Start: Scan QR Code]) --> Input[Input Data: Nama & No. HP]
-    Input --> Check{Sudah Terdaftar?}
-
-    Check -- Ya --> OldNum[Tampilkan Nomor Lama]
-    Check -- Tidak --> NewNum[Generate Nomor Baru]
-
-    OldNum --> Queue[Masuk Queue Pool]
-    NewNum --> Queue
-
-    Queue --> Wait[Waiting State: Menunggu Giliran]
-    Wait --> Listen{WebSocket Event?}
-
-    Listen -- Belum --> Wait
-    Listen -- "Call Next" --> Notify[Notifikasi: Giliran Anda!]
-
-    Notify --> End([End: Menuju Loket])
-
-    style Start fill:#f9f,stroke:#333,stroke-width:2px
-    style End fill:#bbf,stroke:#333,stroke-width:2px
-    style Notify fill:#ff9,stroke:#f66,stroke-width:2px,color:black
-```
-
-**Penjelasan:**
-
-1.  **Akses**: Pengunjung memindai QR Code.
-2.  **Validasi**: Sistem mengecek apakah data pengunjung sudah ada. Jika ya, nomor lama dipulihkan; jika tidak, nomor baru dibuat.
-3.  **Menunggu**: Pengunjung melihat status antrean di layar HP ("Nomor Anda: 05 | Antrean Sekarang: 02").
-4.  **Notifikasi**: Saat Admin memanggil, tampilan di HP pengunjung otomatis berubah tanpa refresh.
-
-### 2. Flowchart Admin (Server Side)
-
-_Logika di balik layar bagaimana petugas mengelola arus antrean._
-
-```mermaid
-graph TD
-    Dash[Dashboard Active: Monitor Antrean] --> Call[Action: Call Next]
-
-    Call --> DB[Database Update: Status 'Calling']
-    DB --> Broadcast[Broadcast Event]
-
-    Broadcast --> TV[TV Monitor: Suara & Visual]
-    Broadcast --> HP[HP Pengunjung: Update UI]
-
-    Call --> Check{Pengunjung Datang?}
-
-    Check -- Ya --> Finish[Action: Finish]
-    Check -- Tidak --> Skip[Action: Skip/Missed]
-
-    Finish --> Loop[Next Antrean]
-    Skip --> Loop
-
-    style Dash fill:#bfb,stroke:#333,stroke-width:2px
-    style Broadcast fill:#f96,stroke:#333,stroke-width:2px,color:white
-```
-
-**Penjelasan:**
-
-1.  **Dashboard**: Admin memantau daftar antrean masuk.
-2.  **Call Next**: Admin menekan tombol panggil.
-3.  **Broadcast**: Server mengirim sinyal ke TV Monitor dan HP Pengunjung secara bersamaan.
-4.  **Penyelesaian**: Admin menandai antrean sebagai "Selesai" atau "Hangus".
-
-### 3. Sinkronisasi Real-time (Behind the Scenes)
-
-Agar tidak perlu melakukan _refresh_ halaman berulang kali, sistem menggunakan pola **Pub/Sub (Publish-Subscribe)**:
-
-- **📢 Publish**: Saat Admin klik "Next", backend mengirim pesan ke satu saluran (_Channel_) khusus.
-- **👂 Subscribe**: Semua HP pengunjung dan TV Monitor "mendengarkan" saluran tersebut.
-- **⚡ Result**: Begitu ada pesan masuk, UI pada ribuan perangkat yang terhubung akan berubah seketika secara serentak.
-
----
-
-## 📂 Struktur Folder (Devilbox Ready)
+## 📂 Struktur Folder
 
 ```
-htdocs/                  # Document Root
+htdocs/                  # Root Web Server (Document Root)
 ├── .env                 # Konfigurasi Environment
-├── index.php            # Entry Point
-├── app/                 # Core Logic (MVC)
-│   ├── src/             # Controllers, Models, Helpers
-│   └── templates/       # Views (HTML/PHP)
-├── assets/              # CSS, JS, Images
-└── bin/                 # CLI Tools (Migrations)
+├── .htaccess            # Keamanan (melindungi folder app)
+├── index.php            # Entry Point Aplikasi
+├── bin/                 # Executable Scripts (CLI)
+│   └── migrate.php      # Runner Migrasi Database
+├── assets/              # File Statis (CSS, JS, Gambar)
+└── app/                 # Inti Aplikasi (LOGIC)
+    ├── config/          # Konfigurasi Global
+    ├── database/        # File Database
+    │   └── migrations/  # File Migrasi (*.php)
+    ├── src/             # Source Code PHP (Namespace: App\)
+    │   ├── Controllers/ # Logika Bisnis & Request Handler
+    │   ├── Core/        # Core Framework (Model, Database, Env)
+    │   ├── Helpers/     # Helper Functions (dd, etc)
+    │   └── Models/      # Model Database (User, Booking, Room)
+    └── templates/       # File Tampilan / View
+        ├── auth/        # View Login/Register
+        └── partials/    # Potongan View (Header, Footer)
 ```
 
-## 🛠️ Teknologi
+## 🛠️ Manajemen Database
 
-- **Bahasa**: PHP Native 8.x
-- **Database**: MySQL / MariaDB
-- **Server**: Nginx / Apache (via Devilbox)
-- **Frontend**: HTML5, CSS3, JavaScript (WebSocket Client)
+### 1. Migrasi Database
 
----
+Sistem ini memiliki tool migrasi bawaan untuk mengelola struktur database.
 
-_Dibuat dengan ❤️ untuk efisiensi antrean._
+**Cara Menjalankan Migrasi (di dalam container Devilbox):**
+
+```bash
+# Masuk ke container (jika belum)
+./shell.bat
+cd /shared/httpd/my-project/htdocs
+
+# Jalankan migrasi
+php bin/migrate.php
+```
+
+**Membuat File Migrasi Baru:**
+Buat file PHP di `app/database/migrations/` dengan format nama `YYYY_MM_DD_HHMMSS_NamaMigrasi.php`.
+Contoh struktur file migrasi bisa dilihat di `app/database/migrations/2026_02_15_000000_CreateUsersTable.php`.
+
+### 2. Menggunakan Model
+
+Gunakan class Model untuk berinteraksi dengan database tanpa menulis SQL mentah.
+
+**Contoh Penggunaan:**
+
+```php
+use App\Models\User;
+
+$userModel = new User();
+
+// Ambil semua data
+$users = $userModel->all();
+
+// Cari berdasarkan ID
+$user = $userModel->find(1);
+
+// Cari dengan kondisi
+$activeUsers = $userModel->where('status', 'active');
+$admin = $userModel->firstWhere('role', 'admin');
+
+// Tambah data baru
+$userModel->create([
+    'name' => 'John Doe',
+    'email' => 'john@example.com',
+    'password' => password_hash('secret', PASSWORD_DEFAULT)
+]);
+```
+
+## 🐞 Debugging & Logging
+
+### Helper `dd()`
+
+Anda bisa menggunakan fungsi `dd($variable)` (Dump and Die) di mana saja dalam kode untuk men-debug variabel dengan tampilan yang rapi.
+
+```php
+$users = $userModel->all();
+dd($users); // Aplikasi akan berhenti dan menampilkan isi $users
+```
+
+### Error Logging
+
+Gunakan `error_log()` untuk mencatat error ke file log server (biasanya bisa dicek via Devilbox dashboard atau file log PHP).
+
+## 📅 Fitur Booking System
+
+Sistem ini mencakup 4 fase alur kerja pemesanan:
+
+1.  **Fase Pencarian (Availability Check)**: User memilih tanggal/jam, sistem mengecek bentrokan jadwal di tabel `bookings`.
+2.  **Fase Reservasi**: Slot dikunci sementara (status `pending`), data masuk ke database.
+3.  **Fase Pembayaran**: Integrasi pembayaran, status berubah menjadi `confirmed`, generate QR Code.
+4.  **Fase Operasional**: Check-in di lokasi menggunakan QR Code.
+
+Tabel pendukung: `users`, `rooms`, `bookings`, `payments`.
+
+## 🚀 Cara Menjalankan Project
+
+1.  Pastikan **Devilbox** sudah berjalan.
+2.  Salin `.env.example` ke `.env` dan sesuaikan konfigurasi database.
+3.  Jalankan migrasi database: `php bin/migrate.php`.
+4.  Buka browser: `http://localhost/my-project` (atau sesuai konfigurasi vhost Devilbox Anda).

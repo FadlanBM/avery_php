@@ -25,24 +25,23 @@
                             <?php endif; ?>
                             <form class="form-horizontal mt-3 form-material" id="loginform"  action="<?php echo BASE_URL; ?>/register" method="POST">
                                 <div class="form-group mb-3">
-                                    <input class="form-control" type="text" required="" placeholder="Username">
+                                    <input class="form-control" type="text" required="true" name="name"  placeholder="Full Name">
                                 </div>
                                 <div class="form-group mb-3">
-                                    <input class="form-control" type="password" required="" placeholder="Password">
+                                    <input class="form-control" type="text" required="true" name="email" placeholder="Email">
                                 </div>
-                                <div class="form-group mb-3 d-flex">
-                                    <div class="checkbox checkbox-info float-left pt-0 ml-2 mb-3">
-                                        <input id="checkbox-signup" type="checkbox">
-                                        <label for="checkbox-signup"> Remember me </label>
-                                    </div> 
-                                    <a href="javascript:void(0)" id="to-recover" class="text-dark ml-auto mb-3"><i class="fa fa-lock mr-1"></i> Forgot pwd?</a> 
+                                <div class="form-group mb-3">
+                                    <div class="input-group">
+                                        <input id="register-password" class="form-control" type="password" required="true" name="password" placeholder="Password">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary toggle-password" type="button" data-target="#register-password">
+                                                <i class="fa fa-eye"></i>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="form-group text-center">
-                                    <button class="btn btn-info btn-lg btn-block text-uppercase waves-effect waves-light" type="submit">Log In</button>
-                                </div>
-                                <div class="social mb-3 text-center">
-                                    <a href="javascript:void(0)" class="btn  btn-facebook" data-toggle="tooltip" title="Login with Facebook"> <i aria-hidden="true" class="fab fa-facebook-f"></i> </a>
-                                    <a href="javascript:void(0)" class="btn btn-googleplus" data-toggle="tooltip" title="Login with Google"> <i aria-hidden="true" class="fab fa-google-plus"></i> </a>
+                                    <button class="btn btn-info btn-lg btn-block text-uppercase waves-effect waves-light" type="submit">Register</button>
                                 </div>
                                 <div class="form-group mb-0">
                                     <div class="text-center">
@@ -80,5 +79,6 @@
         </div>
     </div>
     <?php require_once __DIR__ . '/../partials/scripts-auth.php'; ?>
+    <?php require_once __DIR__ . '/../partials/toast.php'; ?>
 </body>
 </html>

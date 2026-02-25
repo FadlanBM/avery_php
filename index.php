@@ -26,6 +26,9 @@ require_once SRC_ROOT . '/Helpers/functions.php';
 // Load Configuration (After Env)
 require_once APP_ROOT . '/config/config.php';
 
+// Remember Me Auto-Login
+(new \App\Middleware\RememberMeMiddleware())->handle();
+
 // Initialize Router
 $router = new \App\Core\Router();
 
@@ -33,7 +36,8 @@ $router = new \App\Core\Router();
 $router->get('/', [\App\Controllers\HomeController::class, 'index']);
 
 // Dashboard protected with AuthMiddleware
-$router->get('/dashboard', [\App\Controllers\DashboardController::class, 'index']);
+$router->get('/dashboard', [\App\Controllers\DashboardController::class, 'index'], [\App\Middleware\AuthMiddleware::class]);
+$router->get('/dashboard/manage-user', [\App\Controllers\ManageuserController::class, 'index'], [\App\Middleware\AuthMiddleware::class]);
 
 // Auth Routes
 $router->get('/login', [\App\Controllers\AuthController::class, 'login']);

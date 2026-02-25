@@ -32,7 +32,7 @@
                                 </div>
                                 <div class="form-group mb-3 d-flex">
                                     <div class="checkbox checkbox-info float-left pt-0 ml-2 mb-3">
-                                        <input id="checkbox-signup" type="checkbox">
+                                        <input id="checkbox-signup" type="checkbox" name="remember" value="1">
                                         <label for="checkbox-signup"> Remember me </label>
                                     </div> 
                                     <a href="javascript:void(0)" id="to-recover" class="text-dark ml-auto mb-3"><i class="fa fa-lock mr-1"></i> Forgot pwd?</a> 
@@ -80,6 +80,7 @@
         </div>
     </div>
     <?php require_once __DIR__ . '/../partials/scripts-auth.php'; ?>
+    <?php require_once __DIR__ . '/../partials/toast.php'; ?>
 </body>
 
 </html>
