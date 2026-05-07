@@ -237,7 +237,7 @@
             </section>
         </div>
     </main>
-    <?php include 'partials/includes/js.php'; ?>`
+    <?php include 'partials/includes/js.php'; ?>
 </body>
 
 </html>
