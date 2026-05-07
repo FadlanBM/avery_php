@@ -39,14 +39,12 @@ class SettingController extends Controller
             $isActive = ($status == 'on') ? 1 : 0;
             $createdBy = $_SESSION['user_id'] ?? null;
 
-            // Validasi: Nama wajib diisi
             if (empty($name)) {
                 FlashMessage::error('Nama metode pembayaran wajib diisi.');
                 header('Location: ' . BASE_URL . '/dashboard/settings');
                 exit;
             }
 
-            // Validasi: Sesi user wajib ada
             if (!$createdBy) {
                 FlashMessage::error('Sesi tidak valid, silakan login ulang.');
                 header('Location: ' . BASE_URL . '/login');
@@ -54,7 +52,6 @@ class SettingController extends Controller
             }
 
             try {
-                // Sanitize input untuk keamanan XSS
                 $name = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
 
                 $payment = new PaymentMethod();
@@ -63,6 +60,38 @@ class SettingController extends Controller
                 FlashMessage::success('Metode pembayaran berhasil ditambahkan!');
             } catch (\Exception $e) {
                 FlashMessage::error('Gagal menambahkan metode pembayaran: ' . $e->getMessage());
+            }
+
+            header('Location: ' . BASE_URL . '/dashboard/settings');
+            exit;
+        }
+    }
+
+    public function deletePayment()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $id = $_POST['id'] ?? null;
+            $deletedBy = $_SESSION['user_id'] ?? null;
+
+            if (!$id) {
+                FlashMessage::error('ID metode pembayaran tidak valid.');
+                header('Location: ' . BASE_URL . '/dashboard/settings');
+                exit;
+            }
+
+            if (!$deletedBy) {
+                FlashMessage::error('Sesi tidak valid, silakan login ulang.');
+                header('Location: ' . BASE_URL . '/login');
+                exit;
+            }
+
+            try {
+                $payment = new PaymentMethod();
+                $payment->deletePaymentMethod($id);
+
+                FlashMessage::success('Metode pembayaran berhasil dihapus!');
+            } catch (\Exception $e) {
+                FlashMessage::error('Gagal menghapus metode pembayaran: ' . $e->getMessage());
             }
 
             header('Location: ' . BASE_URL . '/dashboard/settings');
