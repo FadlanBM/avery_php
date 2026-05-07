@@ -46,7 +46,8 @@ $router->get('/dashboard/menu-management/add', [\App\Controllers\MenumanagementC
 $router->get('/dashboard/table-management', [\App\Controllers\TablemanagementController::class, 'index'], [\App\Middleware\SuperAdminMiddleware::class]);
 $router->get('/dashboard/table-management/add', [\App\Controllers\TablemanagementController::class, 'addTable'], [\App\Middleware\SuperAdminMiddleware::class]);
 $router->get('/dashboard/settings', [\App\Controllers\SettingController::class, 'index'], [\App\Middleware\SuperAdminMiddleware::class]);
-$router->post('/dashboard/settings/create-payment-method', [\App\Controllers\SettingController::class, 'createPaymentMethod'], [\App\Middleware\SuperAdminMiddleware::class]);
+$router->post('/dashboard/settings/create-payment-method', [\App\Controllers\SettingController::class, 'createPayment'], [\App\Middleware\SuperAdminMiddleware::class]);
+$router->post('/dashboard/settings/delete-payment-method', [\App\Controllers\SettingController::class, 'deletePayment'], [\App\Middleware\SuperAdminMiddleware::class]);
 
 // Employee Dashboard Routes
 $router->get('/employee-dashboard/scan-qr', [\App\Controllers\EmployeeDashboardController::class, 'scanQr']);

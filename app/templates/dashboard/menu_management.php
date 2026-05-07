@@ -256,6 +256,7 @@
             </div>
         </section>
     </main>
+    <?php include 'partials/includes/js.php'; ?>
 </body>
 
 </html>
