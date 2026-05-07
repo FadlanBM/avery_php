@@ -125,7 +125,7 @@
                                 <div class="space-y-4">
                                     <?php
                                     $defaultDays = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
-                                    
+
                                     // Map existing settings for easy lookup
                                     $mappedSettings = [];
                                     if (!empty($openSettings)) {

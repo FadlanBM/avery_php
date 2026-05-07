@@ -17,4 +17,12 @@ class PaymentMethod extends Model
             'created_by' => $createdBy
         ]);
     }
+
+    public function deletePaymentMethod($id)
+    {
+        $stmt = $this->db->prepare("DELETE FROM {$this->table}  WHERE id = :id");
+        $stmt->execute([
+            'id' => $id,
+        ]);
+    }
 }
