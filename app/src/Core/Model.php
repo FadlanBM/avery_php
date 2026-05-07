@@ -4,48 +4,54 @@ namespace App\Core;
 
 use PDO;
 
-abstract class Model
+abstract class Model implements \ArrayAccess
 {
     protected $table;
     protected $primaryKey = 'id';
     protected $db;
+    protected $attributes = [];
 
-    public function __construct()
+    public function __construct(array $attributes = [])
     {
         $this->db = Database::getInstance()->getConnection();
+        $this->attributes = $attributes;
         
         if (!$this->table) {
-            // Infer table name from class name (e.g., User -> users)
             $className = (new \ReflectionClass($this))->getShortName();
-            $this->table = strtolower($className) . 's';
+            // Simple pluralization: User -> users, Role -> roles, RoleModel -> roles
+            $this->table = strtolower(str_replace('Model', '', $className)) . 's';
         }
     }
 
     public function all()
     {
         $stmt = $this->db->query("SELECT * FROM {$this->table}");
-        return $stmt->fetchAll();
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return array_map(fn($attributes) => new static($attributes), $results);
     }
 
     public function find($id)
     {
         $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE {$this->primaryKey} = :id");
         $stmt->execute(['id' => $id]);
-        return $stmt->fetch();
+        $attributes = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $attributes ? new static($attributes) : null;
     }
 
     public function where($column, $value)
     {
         $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE {$column} = :value");
         $stmt->execute(['value' => $value]);
-        return $stmt->fetchAll();
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return array_map(fn($attributes) => new static($attributes), $results);
     }
     
     public function firstWhere($column, $value)
     {
         $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE {$column} = :value LIMIT 1");
         $stmt->execute(['value' => $value]);
-        return $stmt->fetch();
+        $attributes = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $attributes ? new static($attributes) : null;
     }
 
     public function create(array $data)
@@ -61,14 +67,8 @@ abstract class Model
         $stmt = $this->db->prepare($sql);
         
         if ($stmt->execute($data)) {
-            if ($driver === 'pgsql') {
-                $id = $stmt->fetchColumn();
-                return $id ?: true;
-            }
-            if (array_key_exists($this->primaryKey, $data)) {
-                return $data[$this->primaryKey];
-            }
-            return $this->db->lastInsertId();
+            $id = $driver === 'pgsql' ? $stmt->fetchColumn() : $this->db->lastInsertId();
+            return $this->find($id ?: ($data[$this->primaryKey] ?? null));
         }
         return false;
     }
@@ -86,17 +86,45 @@ abstract class Model
         $data['id'] = $id;
         $stmt = $this->db->prepare($sql);
         
-        return $stmt->execute($data);
+        if ($stmt->execute($data)) {
+            $this->attributes = array_merge($this->attributes, $data);
+            return true;
+        }
+        return false;
     }
 
-    public function delete($id)
+    public function delete($id = null)
     {
+        $id = $id ?: ($this->attributes[$this->primaryKey] ?? null);
+        if (!$id) return false;
+
         $stmt = $this->db->prepare("DELETE FROM {$this->table} WHERE {$this->primaryKey} = :id");
         return $stmt->execute(['id' => $id]);
     }
-    
-    // Query Builder Methods (Simplified)
-    public static function query() {
-        return new static();
+
+    // Relationships
+    public function belongsTo($related, $foreignKey, $ownerKey = 'id')
+    {
+        $instance = new $related();
+        $value = $this->attributes[$foreignKey] ?? null;
+        return $value ? $instance->find($value) : null;
     }
+
+    public function hasMany($related, $foreignKey, $localKey = 'id')
+    {
+        $instance = new $related();
+        $value = $this->attributes[$localKey] ?? null;
+        return $value ? $instance->where($foreignKey, $value) : [];
+    }
+
+    // ArrayAccess & Magic Methods
+    public function offsetExists($offset): bool { return isset($this->attributes[$offset]); }
+    public function offsetGet($offset): mixed { return $this->attributes[$offset] ?? null; }
+    public function offsetSet($offset, $value): void { $this->attributes[$offset] = $value; }
+    public function offsetUnset($offset): void { unset($this->attributes[$offset]); }
+
+    public function __get($key) { return $this->attributes[$key] ?? null; }
+    public function __set($key, $value) { $this->attributes[$key] = $value; }
+
+    public static function query() { return new static(); }
 }

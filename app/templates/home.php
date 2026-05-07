@@ -1,284 +1,118 @@
 <!DOCTYPE html>
-<html lang="en">
-      <?php require_once  __DIR__ . '/partials/head-landing.php'; ?>
-<body class="fix-header">
-<div id="wrapper" class="home-page">
-	<!-- end header -->
-	<section id="banner">
-	  <?php 
-        $user_name = 'Markarn Doe';
-        require_once __DIR__ . '/partials/header-landing.php'; 
-        ?>
-	<!-- Slider -->
-        <div id="main-slider" class="flexslider">
-            <ul class="slides">
-              <li>
-                <img src="<?php echo BASE_URL; ?>/assets/landing/img/slides/1.jpg" alt="" />
-                <div class="flex-caption container">
-                    <h3>Tast of Goodness</h3> 
-					<p>Doloribus omnis minus temporibus perferendis ipsa</p>  
-                </div>
-              </li>
-              <li>
-                <img src="<?php echo BASE_URL; ?>/assets/landing/img/slides/2.jpg" alt="" />
-                <div class="flex-caption container">
-                    <h3>Best Time-out</h3> 
-<p>Doloribus omnis minus temporibus perferendis ipsa</p>  					
-                </div>
-              </li>
-            </ul>
+<html lang="id">
+<?php require_once  __DIR__ . '/includes/header.php'; ?>
+
+<body>
+  <?php require_once __DIR__ . '/includes/navbar.php'; ?>
+  <main class="pb-20 pt-24">
+    <!-- Hero Section -->
+    <section class="mx-auto grid min-h-[700px] max-w-[1280px] grid-cols-1 items-center gap-12 px-8 md:grid-cols-12">
+      <div class="flex flex-col gap-8 md:col-span-6">
+        <div class="inline-flex w-fit items-center gap-2 rounded-full bg-[#aeefb3] px-4 py-1.5 text-sm font-semibold text-[#336f3e]">
+          <span class="material-symbols-outlined">restaurant_menu</span>
+          DIGITAL CONCIERGE
         </div>
-	<!-- end slider -->
- 
-	</section>
-	<section class="txt-area">
-	<div class="container">
-		<div class="row">
-			<div class="col-lg-12">
-				<div class="aligncenter"><h1 class="aligncenter">Our Services</h1>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolores quae porro consequatur aliquam, incidunt eius magni provident, doloribus omnis minus temporibus perferendis nesciunt quam repellendus nulla nemo ipsum odit corrupti consequuntur possimus.</div>
-				
-			</div>
-		</div>
-	</div>
-	</section>
-	
-	
-	<section id="services">
-	
-	
-	<div class="container">
-		<div class="row">
-                <div class="features">
-                    <div class="col-md-4 col-sm-6 wow fadeInUp animated" data-wow-duration="300ms" data-wow-delay="0ms" style="visibility: visible; -webkit-animation-duration: 300ms; -webkit-animation-delay: 0ms;">
-                        <div class="media service-box">
-                            <div class="pull-left">
-                                <img src="<?php echo BASE_URL; ?>/assets/landing/img/1.png" alt="" />
-                            </div>
-                            <div class="media-body">
-                                <h4 class="media-heading">Salad</h4>
-                                <p>Backed by some of the biggest names in the industry, Firefox OS is an open platform that fosters greater</p>
-                            </div>
-                        </div>
-                    </div><!--/.col-md-4-->
+        <h1 class="text-6xl font-extrabold leading-[1.1] tracking-[-0.025em] text-[#1d1b17] md:text-[4.5rem] [font-family:'Plus_Jakarta_Sans',sans-serif]">
+          Nikmati Rasa,<br />
+          <span class="italic text-[#9c3800]">Tanpa Menunggu.</span>
+        </h1>
+        <p class="max-w-[32rem] text-xl font-light leading-[1.6] text-[#594238]">
+          Saffron &amp; Sage menghadirkan kemudahan memesan langsung dari meja Anda. Cukup gunakan kode QR atau masukkan kode unik meja Anda.
+        </p>
+        <div class="flex flex-col gap-4 pt-4 sm:flex-row">
+          <a href="/scan-qr" class="inline-flex items-center justify-center gap-3 rounded-xl bg-[#9c3800] px-8 py-4 text-lg font-bold text-white shadow-[0_8px_24px_-4px_rgba(196,73,0,0.06)] transition hover:-translate-y-0.5 hover:bg-[#c44900]">
+            <span class="material-symbols-outlined">qr_code_scanner</span>Scan QR
+          </a>
+        </div>
+      </div>
 
-                    <div class="col-md-4 col-sm-6 wow fadeInUp animated" data-wow-duration="300ms" data-wow-delay="100ms" style="visibility: visible; -webkit-animation-duration: 300ms; -webkit-animation-delay: 100ms;">
-                        <div class="media service-box">
-                            <div class="pull-left">
-                                 <img src="<?php echo BASE_URL; ?>/assets/landing/img/2.png" alt="" />
-                            </div>
-                            <div class="media-body">
-                                <h4 class="media-heading">Breakfast</h4>
-                                <p>Backed by some of the biggest names in the industry, Firefox OS is an open platform that fosters greater</p>
-                            </div>
-                        </div>
-                    </div><!--/.col-md-4-->
+      <!-- Hero Visuals -->
+      <div class="relative md:col-span-6">
+        <div class="relative z-10 aspect-[4/5] overflow-hidden rounded-[2rem] shadow-[0_8px_24px_-4px_rgba(196,73,0,0.06)]">
+          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3SJ3UQH9L-9QO_DZC5-e-eRGLh6XbUJslIM0LI_kSVAMpb90Yn4pwY5f-Vdkf5CZgQeh50JbceGhsDbuOhWwJ0A1BIcXsSaQRnf5nTSImtFhAQaBOeUMVI-zpvvc6JstuJHtIg0_HQU9pn_PKRilTv5u74Wfk3Rp7qFGrVIPfzl3EQf8C1HJVNd36YPPmtRE8E5PpJ_7FX5fExgJdEHSuJ-iem2LlEEPc8E-ZWeKFfZAwkFQrPjC-iN30ztmNjbbkFJ3aQBFr5KdQ" alt="Restaurant Interior" />
+          <div class="absolute inset-0 bg-gradient-to-t from-[rgba(156,56,0,0.4)] to-transparent"></div>
+        </div>
+        <!-- Overlapping Card -->
+        <div class="absolute -bottom-10 left-0 z-20 max-w-[280px] rounded-3xl bg-white p-8 shadow-[0_8px_24px_-4px_rgba(196,73,0,0.06)] md:-left-10">
+          <div class="mb-6 flex aspect-square w-full items-center justify-center rounded-2xl bg-[#f3ede6]">
+            <img class="h-32 w-32 opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4bT4GUfk8xc9An0vtr2rxLXlie8sAtESqQ9T6YUkh_qwSrb5pEnxRodthcrA2bI1ecbzJ9bPpc_4Rqo1elp0HXYS56b3d2zhcUFX7fL_K7a8USyx92lS0VtyRX1FAS76my5MxBi4FcevuIOuL-eRONWiDn-abOvL48WB9aI4QF_XWSmq2H5sjLJV-VRoqFX8X2lVeD2bqHaeDDinXYozq_VGVGcv7FTYQv6hX1RO6NlZR0AJTAcF4dBR5RitVL1f74BPXb__qdNYn" alt="QR Code" />
+          </div>
+          <p class="text-lg font-bold text-[#1d1b17]">Pindai di Meja Anda</p>
+          <p class="mt-2 text-sm leading-[1.4] text-[#594238]">Akses menu eksklusif kami secara instan melalui ponsel Anda.</p>
+        </div>
+        <!-- Decorative element -->
+        <div class="absolute -right-6 -top-6 -z-10 h-32 w-32 rounded-full bg-[#ffdbce] opacity-30 blur-[32px]"></div>
+      </div>
+    </section>
 
-                    <div class="col-md-4 col-sm-6 wow fadeInUp animated" data-wow-duration="300ms" data-wow-delay="200ms" style="visibility: visible; -webkit-animation-duration: 300ms; -webkit-animation-delay: 200ms;">
-                        <div class="media service-box">
-                            <div class="pull-left">
-                                <img src="<?php echo BASE_URL; ?>/assets/landing/img/3.png" alt="" />
-                            </div>
-                            <div class="media-body">
-                                <h4 class="media-heading">Lunch</h4>
-                                <p>Morbi vitae tortor tempus, placerat leo et, suscipit lectus. Phasellus ut euismod massa, eu eleifend ipsum.</p>
-                            </div>
-                        </div>
-                    </div><!--/.col-md-4-->
-                
-                    <div class="col-md-4 col-sm-6 wow fadeInUp animated" data-wow-duration="300ms" data-wow-delay="300ms" style="visibility: visible; -webkit-animation-duration: 300ms; -webkit-animation-delay: 300ms;">
-                        <div class="media service-box">
-                            <div class="pull-left">
-                                 <img src="<?php echo BASE_URL; ?>/assets/landing/img/4.png" alt="" />
-                            </div>
-                            <div class="media-body">
-                                <h4 class="media-heading">Dinner</h4>
-                                <p>Morbi vitae tortor tempus, placerat leo et, suscipit lectus. Phasellus ut euismod massa, eu eleifend ipsum.</p>
-                            </div>
-                        </div>
-                    </div><!--/.col-md-4-->
-
-                    <div class="col-md-4 col-sm-6 wow fadeInUp animated" data-wow-duration="300ms" data-wow-delay="400ms" style="visibility: visible; -webkit-animation-duration: 300ms; -webkit-animation-delay: 400ms;">
-                        <div class="media service-box">
-                            <div class="pull-left">
-                                 <img src="<?php echo BASE_URL; ?>/assets/landing/img/5.png" alt="" />
-                            </div>
-                            <div class="media-body">
-                                <h4 class="media-heading">Drinks</h4>
-                                <p>Morbi vitae tortor tempus, placerat leo et, suscipit lectus. Phasellus ut euismod massa, eu eleifend ipsum.</p>
-                            </div>
-                        </div>
-                    </div><!--/.col-md-4-->
-
-                    <div class="col-md-4 col-sm-6 wow fadeInUp animated" data-wow-duration="300ms" data-wow-delay="500ms" style="visibility: visible; -webkit-animation-duration: 300ms; -webkit-animation-delay: 500ms;">
-                        <div class="media service-box">
-                            <div class="pull-left">
-                                <img src="<?php echo BASE_URL; ?>/assets/landing/img/7.png" alt="" />
-                            </div>
-                            <div class="media-body">
-                                <h4 class="media-heading">Party</h4>
-                                <p>Morbi vitae tortor tempus, placerat leo et, suscipit lectus. Phasellus ut euismod massa, eu eleifend ipsum.</p>
-                            </div>
-                        </div>
-                    </div><!--/.col-md-4-->
-                </div>
-            </div>	 
-	 
-
-	</div>
-	
-	</section>
-	
-		<section class="aboutUs">
-	<div class="container">
-		<div class="row">
-			<div class="col-md-12">
-				<div class="aligncenter"><h2 class="aligncenter">Welcome!</h2>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</div>
-				<br/>
-			</div>
-		</div> 
-		<div class="row">
-							<div class="col-md-6">
-								<img src="<?php echo BASE_URL; ?>/assets/landing/img/img1.png" alt="">
-								<div class="space"></div>
-							</div>
-							<div class="col-md-6">
-								<p><h4>Lorem ipsum dolor sit amet, cadipisicing  sit amet, consectetur adipisicing elit. Atque sed, quidem quis praesentium, ut unde fuga error commodi architecto, oribus omnis minus autem nemo numquam, ipsa architecto non. magni consequuntlaudantium culpa tenetur at id, beatae pet.</h4></p>
-								<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. adipisicing  sit amet, consectetur adipisicing elit. Atque sed, quidem quis praesentium,m deserunt.</p>
-								<ul class="list-unstyled">
-									<li><i class="fa fa-arrow-circle-right pr-10 colored"></i> Lorem ipsum enimdolor sit amet</li>
-									<li><i class="fa fa-arrow-circle-right pr-10 colored"></i> Explicabo deleniti neque aliquid</li>
-									<li><i class="fa fa-arrow-circle-right pr-10 colored"></i> Consectetur adipisicing elit</li>
-									<li><i class="fa fa-arrow-circle-right pr-10 colored"></i> Lorem ipsum dolor sit amet</li>
-									<li><i class="fa fa-arrow-circle-right pr-10 colored"></i> Quo issimos molest quibusdam temporibus</li>
-								</ul>
-							</div>
-						</div>
-	
-	</div>
-	</section>
-	<section id='events'>
-	<div class="container">
-	<div class="row">
-			<div class="col-md-12">
-				<div class="aligncenter"><h2 class="aligncenter">Our Events</h2>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolores quae porro consequatur aliquam, incidunt eius magni provident, doloribus omnis minus temporibus perferendis nesciunt quam repellendus nulla nemo ipsum odit corrupti consequuntur possimus.</div>
-				<br>
-			</div>
-		</div>
-	<div class="row">
-                <div class="col-md-4">
-                    <div class="post3">
-                        <img src="<?php echo BASE_URL; ?>/assets/landing/img/e1.png" alt="">
-                        <a href="#">
-                            <time datetime="2015-03-01">
-                                <span class="year">2015</span>
-                                <span class="month">Feb</span>
-                            </time>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipis.</p>
-                        </a>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="post3">
-                        <img src="<?php echo BASE_URL; ?>/assets/landing/img/e2.png" alt="">
-                        <a href="#">
-                            <time datetime="2015-03-01">
-                                <span class="year">2015</span>
-                                <span class="month">March</span>
-                            </time>
-                            <p>Apsum dolor sit amet, consectetur adipisdslif.</p>
-                        </a>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="post3">
-                        <img src="<?php echo BASE_URL; ?>/assets/landing/img/e3.png" alt="">
-                        <a href="#">
-                            <time datetime="2015-03-01">
-                                <span class="year">2015</span>
-                                <span class="month">April</span>
-                            </time>
-                            <p>Dolor sit amet, consectetur adipisic indfeft</p>
-                        </a>
-                    </div>
-                </div>
+    <!-- Instructions Section -->
+    <section class="mt-32 bg-[#f9f3ec] py-24">
+      <div class="mx-auto max-w-[1280px] px-8">
+        <div class="mb-20 text-center">
+          <h2 class="text-4xl font-extrabold tracking-[-0.025em] text-[#1d1b17] [font-family:'Plus_Jakarta_Sans',sans-serif]">Cara Memesan</h2>
+          <div class="mx-auto mt-4 h-1.5 w-24 rounded-full bg-[#9c3800]"></div>
+        </div>
+        <div class="grid grid-cols-1 gap-12 md:grid-cols-3">
+          <!-- Step 1 -->
+          <div class="relative overflow-hidden rounded-[2.5rem] bg-white p-10 transition hover:-translate-y-[5px]">
+            <div class="pointer-events-none absolute right-4 top-2 select-none text-8xl font-black text-[rgba(231,226,219,0.5)]">01</div>
+            <div class="mb-8 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#c44900] text-white">
+              <span class="material-symbols-outlined">qr_code_scanner</span>
             </div>
-	</div>
-	</section> 
-	<footer>
-	<div class="container">
-		<div class="row">
-			<div class="col-lg-3">
-				<div class="widget">
-					<h5 class="widgetheading">Our Contact</h5>
-					<address>
-					<strong>Bistro company Inc</strong><br>
-					JC Main Road, Near Silnile tower<br>
-					 Pin-21542 NewYork US.</address>
-					<p>
-						<i class="icon-phone"></i> (123) 456-789 - 1255-12584 <br>
-						<i class="icon-envelope-alt"></i> email@domainname.com
-					</p>
-				</div>
-			</div>
-			<div class="col-lg-3">
-				<div class="widget">
-					<h5 class="widgetheading">Quick Links</h5>
-					<ul class="link-list">
-						<li><a href="#">Latest Events</a></li>
-						<li><a href="#">Terms and conditions</a></li>
-						<li><a href="#">Privacy policy</a></li>
-						<li><a href="#">Career</a></li>
-						<li><a href="#">Contact us</a></li>
-					</ul>
-				</div>
-			</div>
-			<div class="col-lg-3">
-				<div class="widget">
-					<h5 class="widgetheading">Latest posts</h5>
-					<ul class="link-list">
-						<li><a href="#">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</a></li>
-						<li><a href="#">Pellentesque et pulvinar enim. Quisque at tempor ligula</a></li>
-						<li><a href="#">Natus error sit voluptatem accusantium doloremque</a></li>
-					</ul>
-				</div>
-			</div>
-			<div class="col-lg-3">
-				<div class="widget">
-					<h5 class="widgetheading">Recent News</h5>
-					<ul class="link-list">
-						<li><a href="#">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</a></li>
-						<li><a href="#">Pellentesque et pulvinar enim. Quisque at tempor ligula</a></li>
-						<li><a href="#">Natus error sit voluptatem accusantium doloremque</a></li>
-					</ul>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div id="sub-footer">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-6">
-					<div class="copyright">
-						<p>
-							<span>&copy; Bistro Restaurant 2015 All right reserved. By </span><a href="http://webthemez.com" Bistro="_blank">WebThemez</a>
-						</p>
-					</div>
-				</div>
-				<div class="col-lg-6">
-					<ul class="social-network">
-						<li><a href="#" data-placement="top" title="Facebook"><i class="fa fa-facebook"></i></a></li>
-						<li><a href="#" data-placement="top" title="Twitter"><i class="fa fa-twitter"></i></a></li>
-						<li><a href="#" data-placement="top" title="Linkedin"><i class="fa fa-linkedin"></i></a></li>
-						<li><a href="#" data-placement="top" title="Pinterest"><i class="fa fa-pinterest"></i></a></li>
-						<li><a href="#" data-placement="top" title="Google plus"><i class="fa fa-google-plus"></i></a></li>
-					</ul>
-				</div>
-			</div>
-		</div>
-	</div>
-	</footer>
-</div>
-<a href="#" class="scrollup"><i class="fa fa-angle-up active"></i></a></body>
-    <?php require_once __DIR__ . '/partials/scripts-landing.php'; ?>
-    <?php require_once __DIR__ . '/partials/toast.php'; ?>
+            <h3 class="mb-4 text-2xl font-bold [font-family:'Plus_Jakarta_Sans',sans-serif]">Pindai QR</h3>
+            <p class="leading-[1.6] text-[#594238]">Gunakan kamera ponsel Anda untuk memindai kode QR yang tersedia di setiap meja Saffron &amp; Sage.</p>
+          </div>
+          <!-- Step 2 -->
+          <div class="relative overflow-hidden rounded-[2.5rem] bg-white p-10 transition hover:-translate-y-[5px]">
+            <div class="pointer-events-none absolute right-4 top-2 select-none text-8xl font-black text-[rgba(231,226,219,0.5)]">02</div>
+            <div class="mb-8 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#2e6a3a] text-white">
+              <span class="material-symbols-outlined">restaurant</span>
+            </div>
+            <h3 class="mb-4 text-2xl font-bold [font-family:'Plus_Jakarta_Sans',sans-serif]">Pilih Menu</h3>
+            <p class="leading-[1.6] text-[#594238]">Jelajahi menu kurasi kami dengan deskripsi detail dan foto hidangan yang menggugah selera.</p>
+          </div>
+          <!-- Step 3 -->
+          <div class="relative overflow-hidden rounded-[2.5rem] bg-white p-10 transition hover:-translate-y-[5px]">
+            <div class="pointer-events-none absolute right-4 top-2 select-none text-8xl font-black text-[rgba(231,226,219,0.5)]">03</div>
+            <div class="mb-8 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#8d6c00] text-[#fff5e8]">
+              <span class="material-symbols-outlined">shopping_bag</span>
+            </div>
+            <h3 class="mb-4 text-2xl font-bold [font-family:'Plus_Jakarta_Sans',sans-serif]">Konfirmasi</h3>
+            <p class="leading-[1.6] text-[#594238]">Selesaikan pesanan Anda langsung dari aplikasi. Tim kami akan segera menyiapkan hidangan Anda.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Feature Section -->
+    <section class="mx-auto grid max-w-[1280px] grid-cols-1 items-center gap-16 px-8 py-32 md:grid-cols-2">
+      <div class="grid grid-cols-2 gap-6 md:order-1">
+        <img class="aspect-square w-full rounded-3xl object-cover shadow-[0_8px_24px_-4px_rgba(196,73,0,0.06)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDAYdRvp2QUacoras9WSyvslYZRjEWj7QPNFp_8_XqoSjaw77CnpoLKFHXBKMoseTFAaSLPX17hMScqD3F4S09mzmUBFhH7GAMeBjVFwG_yYRrq6tLUHF0vOsi7_1MPwmN40VKKcMr7DTa1GQcSP01bwrdyX4WUHMtTNXxPvpznMk--zuenKntGrgX8ssCEogRFhTD9eUTr_7j2rVbjN2fNv14vf4gHnnCY9wwy2BuBcAd_aZAxatT2W9YhhkJEgSHFdrNyXnnwaxAG" alt="Fine Dining Plate" />
+        <img class="mt-12 aspect-square w-full rounded-3xl object-cover shadow-[0_8px_24px_-4px_rgba(196,73,0,0.06)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwXy-x3vaP4w6WxEPpQgKoHF6Xbw-trgKAkzMLP-REdcbC8LkOWUPYL-u5sVyi7Yv0Vxj7dR5bIznow__hsrfVTF3GApFokb5xVKxd9OUgBV7sMvt5kmdJ9qgnwfqVm06UnTQBp3y6Nq2w_kRdsUixsAtPiZyFzu09vz_wtG97Uy7GCWX_MQIFGeYO8BY1KNKMnyZmiMR_QDrHrA5eDHXISUAfPlwxZeCp0ktWIlpRo4eVYwC8b3EeNnyoF54kH6M0hg212wuJ8k1h" alt="Gourmet Detail" />
+      </div>
+      <div class="flex flex-col gap-8 md:order-2">
+        <h2 class="text-5xl font-extrabold leading-[1.2] [font-family:'Plus_Jakarta_Sans',sans-serif]">Pengalaman Kuliner yang <span class="italic text-[#2e6a3a]">Pribadi.</span></h2>
+        <p class="text-lg leading-[1.6] text-[#594238]">
+          Setiap hidangan di Saffron &amp; Sage dibuat dengan bahan-bahan organik terbaik. Sistem pemesanan digital kami memastikan instruksi khusus Anda tersampaikan dengan akurat ke dapur kami.
+        </p>
+        <ul class="flex list-none flex-col gap-4">
+          <li class="flex items-center gap-4 font-semibold">
+            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-[#aeefb3] text-[#336f3e]">
+              <span class="material-symbols-outlined">check</span>
+            </div>
+            Bebas Antrian di Kasir
+          </li>
+          <li class="flex items-center gap-4 font-semibold">
+            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-[#aeefb3] text-[#336f3e]">
+              <span class="material-symbols-outlined">check</span>
+            </div>
+            Pembayaran Digital yang Aman
+          </li>
+        </ul>
+      </div>
+    </section>
+  </main>
+  <?php require_once  __DIR__ . '/includes/footer.php'; ?>
+</body>
+
 </html>

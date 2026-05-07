@@ -52,6 +52,8 @@ cd /shared/httpd/my-project/htdocs
 
 # Jalankan migrasi
 php bin/migrate.php
+
+php bin/seed.php
 ```
 
 **Membuat File Migrasi Baru:**

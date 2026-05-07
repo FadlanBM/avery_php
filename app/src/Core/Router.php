@@ -46,8 +46,15 @@ class Router {
 
             // Execute Middlewares
             foreach ($middlewares as $middleware) {
-                $middlewareInstance = new $middleware();
-                $middlewareInstance->handle();
+                $parameter = null;
+                $middlewareClass = $middleware;
+
+                if (is_string($middleware) && strpos($middleware, ':') !== false) {
+                    [$middlewareClass, $parameter] = explode(':', $middleware);
+                }
+
+                $middlewareInstance = new $middlewareClass();
+                $middlewareInstance->handle($parameter);
             }
             
             if (is_array($callback)) {

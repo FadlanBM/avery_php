@@ -24,3 +24,4 @@ app/logs/*.log
 # Temp
 tmp/
 temp/
+.vercel

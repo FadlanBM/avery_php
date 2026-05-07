@@ -4,10 +4,30 @@ use App\Core\Database;
 
 class AddRememberToUsers
 {
+    private function tableExists(\PDO $db, string $driver, string $table): bool
+    {
+        if ($driver === 'pgsql') {
+            $stmt = $db->prepare("SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = :table LIMIT 1");
+            $stmt->execute(['table' => $table]);
+            return (bool) $stmt->fetchColumn();
+        }
+
+        $dbName = $db->query('SELECT DATABASE()')->fetchColumn();
+        $stmt = $db->prepare("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = :db AND table_name = :table");
+        $stmt->execute(['db' => $dbName, 'table' => $table]);
+
+        return (int) $stmt->fetchColumn() > 0;
+    }
+
     public function up()
     {
         $db = Database::getInstance()->getConnection();
         $driver = $db->getAttribute(\PDO::ATTR_DRIVER_NAME);
+
+        if (!$this->tableExists($db, $driver, 'users')) {
+            echo "Skipping 'AddRememberToUsers' because table 'users' does not exist yet.\n";
+            return;
+        }
 
         if ($driver === 'pgsql') {
             // Check and add remember_token
@@ -45,6 +65,11 @@ class AddRememberToUsers
         $db = Database::getInstance()->getConnection();
         $driver = $db->getAttribute(\PDO::ATTR_DRIVER_NAME);
 
+        if (!$this->tableExists($db, $driver, 'users')) {
+            echo "Skipping revert for 'AddRememberToUsers' because table 'users' does not exist.\n";
+            return;
+        }
+
         if ($driver === 'pgsql') {
             // Drop columns if exist
             $db->exec("ALTER TABLE users DROP COLUMN IF EXISTS remember_expires_at");
@@ -67,4 +92,3 @@ class AddRememberToUsers
         echo "Migration 'AddRememberToUsers' reverted successfully.\n";
     }
 }
-

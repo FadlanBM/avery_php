@@ -3,9 +3,14 @@
 namespace App\Models;
 
 use App\Core\Model;
+use App\Models\RoleModel;
 
 class User extends Model
 {
     protected $table = 'users';
-    // Add any specific model methods here
+
+    public function role()
+    {
+        return $this->belongsTo(RoleModel::class, 'role_id', 'id');
+    }
 }

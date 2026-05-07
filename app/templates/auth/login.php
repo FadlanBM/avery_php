@@ -1,86 +1,94 @@
+<?php
+// Get values from session or other sources if needed
+$email_value = isset($_POST['email']) ? htmlspecialchars($_POST['email']) : '';
+?>
 <!DOCTYPE html>
-<html dir="ltr">
-    <?php require_once  __DIR__ . '/../partials/head.php'; ?>
-<body class="fix-header">
-    <div class="main-wrapper">
-        <div class="preloader">
-            <div class="lds-ripple">
-                <div class="lds-pos"></div>
-                <div class="lds-pos"></div>
+<html class="light" lang="id">
+<?php require_once __DIR__ . '/includes/head.php'; ?>
+
+
+<body class="min-h-screen flex flex-col text-on-surface">
+    <!-- Main Content: Login Shell -->
+    <main class="flex-grow flex items-center justify-center pt-32 pb-20 px-6 relative overflow-hidden">
+        <!-- Asymmetric Background Elements -->
+        <div class="absolute -top-20 -left-20 w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-20 -right-20 w-96 h-96 bg-secondary/5 rounded-full blur-3xl"></div>
+
+        <div class="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 bg-surface-container-lowest rounded-[2rem] overflow-hidden editorial-shadow relative z-10">
+            <!-- Left Side: Editorial Image & Branding -->
+            <div class="hidden md:block relative h-full min-h-[600px]">
+                <img class="absolute inset-0 w-full h-full object-cover" alt="Saffron-infused risotto" src="<?php echo BASE_URL; ?>/assets/images/auth/login_bg.jpg" />
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex flex-col justify-end p-12">
+                    <h2 class="text-surface-container-lowest font-display font-extrabold text-4xl leading-tight mb-4">
+                        Kelezatan yang<br />Menunggu Anda
+                    </h2>
+                    <p class="text-stone-200 font-body text-lg max-w-xs">
+                        Masuk kembali ke dunia cita rasa premium Saffron &amp; Sage.
+                    </p>
+                </div>
             </div>
-        </div>
-        <div class="auth-wrapper d-flex no-block justify-content-center align-items-center" style="background:url(../assets/images/background/login-register.jpg) no-repeat top center;">
-            <div class="auth-box p-4 bg-white rounded">
-                <div id="loginform">
-                    <div class="logo">
-                        <h3 class="box-title mb-3">Sign In</h3>
+            <!-- Right Side: Login Form -->
+            <div class="p-8 md:p-16 flex flex-col justify-center bg-surface-container-lowest">
+                <div class="mb-10">
+                    <h1 class="font-display font-bold text-3xl text-on-surface mb-2">Selamat Datang</h1>
+                    <p class="text-on-surface-variant font-body">Silakan masuk untuk melanjutkan pesanan Anda.</p>
+                </div>
+
+                <?php if (isset($error)): ?>
+                    <div class="bg-error-container text-on-error-container p-4 rounded-xl mb-6 flex items-center gap-3">
+                        <span class="material-symbols-outlined">error</span>
+                        <p class="text-sm font-medium"><?php echo $error; ?></p>
                     </div>
-                    <!-- Form -->
-                    <div class="row">
-                        <div class="col-12">
-                            <?php if (isset($error)): ?>
-                                <div class="alert alert-danger" role="alert">
-                                    <?php echo $error; ?>
-                                </div>
-                            <?php endif; ?>
-                            <form class="form-horizontal mt-3 form-material" id="loginform" action="<?php echo BASE_URL; ?>/login" method="POST">
-                                <div class="form-group mb-3">
-                                    <input class="form-control" type="email" name="email" required="" placeholder="Email">
-                                </div>
-                                <div class="form-group mb-3">
-                                    <input class="form-control" type="password" name="password" required="" placeholder="Password">
-                                </div>
-                                <div class="form-group mb-3 d-flex">
-                                    <div class="checkbox checkbox-info float-left pt-0 ml-2 mb-3">
-                                        <input id="checkbox-signup" type="checkbox" name="remember" value="1">
-                                        <label for="checkbox-signup"> Remember me </label>
-                                    </div> 
-                                    <a href="javascript:void(0)" id="to-recover" class="text-dark ml-auto mb-3"><i class="fa fa-lock mr-1"></i> Forgot pwd?</a> 
-                                </div>
-                                <div class="form-group text-center">
-                                    <button class="btn btn-info btn-lg btn-block text-uppercase waves-effect waves-light" type="submit">Log In</button>
-                                </div>
-                                <div class="social mb-3 text-center">
-                                    <a href="javascript:void(0)" class="btn  btn-facebook" data-toggle="tooltip" title="Login with Facebook"> <i aria-hidden="true" class="fab fa-facebook-f"></i> </a>
-                                    <a href="javascript:void(0)" class="btn btn-googleplus" data-toggle="tooltip" title="Login with Google"> <i aria-hidden="true" class="fab fa-google-plus"></i> </a>
-                                </div>
-                                <div class="form-group mb-0">
-                                    <div class="text-center">
-                                        <p>Don't have an account? <a href="<?php echo BASE_URL; ?>/register" class="text-info font-weight-normal ml-1">Sign Up</a></p>
-                                    </div>
-                                </div>
-                            </form>
+                <?php endif; ?>
+
+                <form class="space-y-6" action="<?php echo BASE_URL; ?>/login" method="POST">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-semibold text-on-surface-variant px-1" for="username">Username</label>
+                        <div class="relative">
+                            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">mail</span>
+                            <input class="w-full pl-12 pr-4 py-4 bg-surface-container-high border-none rounded-xl focus:ring-2 focus:ring-primary/20 text-on-surface placeholder-outline/60 transition-all outline-none" id="username" name="username" placeholder="username" type="text" value="<?php echo $email_value; ?>" required />
                         </div>
                     </div>
-                </div>
-                <div id="recoverform">
-                    <div class="logo">
-                        <h3 class="font-weight-medium mb-3">Recover Password</h3>
-                        <span>Enter your Email and instructions will be sent to you!</span>
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center px-1">
+                            <label class="block text-sm font-semibold text-on-surface-variant" for="password">Kata Sandi</label>
+                            <a class="text-sm font-medium text-primary hover:underline underline-offset-4" href="#">Lupa Password?</a>
+                        </div>
+                        <div class="relative">
+                            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">lock</span>
+                            <input class="w-full pl-12 pr-4 py-4 bg-surface-container-high border-none rounded-xl focus:ring-2 focus:ring-primary/20 text-on-surface placeholder-outline/60 transition-all outline-none" id="password" name="password" placeholder="••••••••" type="password" required />
+                            <button class="absolute right-4 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors" type="button" onclick="togglePassword()">
+                                <span class="material-symbols-outlined" id="password-toggle-icon">visibility</span>
+                            </button>
+                        </div>
                     </div>
-                    <div class="row mt-3">
-                        <!-- Form -->
-                        <form class="col-12 form-material" action="index.html">
-                            <!-- email -->
-                            <div class="form-group row">
-                                <div class="col-12">
-                                    <input class="form-control" type="email" required="" placeholder="Username">
-                                </div>
-                            </div>
-                            <!-- pwd -->
-                            <div class="row mt-3">
-                                <div class="col-12">
-                                    <button class="btn btn-blo  ck btn-lg btn-primary text-uppercase" type="submit" name="action">Reset</button>
-                                </div>
-                            </div>
-                        </form>
+
+                    <div class="flex items-center gap-2 px-1">
+                        <input type="checkbox" id="remember" name="remember" value="1" class="rounded border-outline-variant text-primary focus:ring-primary">
+                        <label for="remember" class="text-sm text-on-surface-variant">Ingat saya</label>
                     </div>
-                </div>
+
+                    <button class="w-full py-4 bg-gradient-to-r from-primary to-primary-container text-on-primary font-display font-bold text-lg rounded-xl editorial-shadow hover:opacity-90 active:scale-[0.98] transition-all" type="submit">
+                        Masuk
+                    </button>
+                </form>
             </div>
         </div>
-    </div>
-    <?php require_once __DIR__ . '/../partials/scripts-auth.php'; ?>
-    <?php require_once __DIR__ . '/../partials/toast.php'; ?>
+    </main>
+
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('password-toggle-icon');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.innerText = 'visibility_off';
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.innerText = 'visibility';
+            }
+        }
+    </script>
 </body>
 
 </html>

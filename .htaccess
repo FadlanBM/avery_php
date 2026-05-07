@@ -1,5 +1,12 @@
-# Protect app directory
 RewriteEngine On
+
+RewriteBase /
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# Protect app directory
 RewriteRule ^app/.*$ - [F,L]
 
 # Protect .env files

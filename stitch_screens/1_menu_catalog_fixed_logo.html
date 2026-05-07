@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,800&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;family=Instrument+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "tertiary-fixed-dim": "#ecc156",
+              "surface-container-lowest": "#ffffff",
+              "on-tertiary-container": "#fff5e8",
+              "tertiary": "#6f5500",
+              "on-secondary-container": "#336f3e",
+              "on-error-container": "#93000a",
+              "surface-container": "#f3ede6",
+              "secondary-fixed-dim": "#96d69b",
+              "primary-container": "#c44900",
+              "on-secondary-fixed-variant": "#135225",
+              "surface-tint": "#a53c00",
+              "on-surface-variant": "#594238",
+              "primary": "#9c3800",
+              "on-secondary-fixed": "#002109",
+              "on-primary": "#ffffff",
+              "background": "#fef8f1",
+              "on-primary-fixed-variant": "#7e2c00",
+              "inverse-surface": "#32302c",
+              "inverse-on-surface": "#f6f0e9",
+              "on-error": "#ffffff",
+              "primary-fixed": "#ffdbce",
+              "secondary": "#2e6a3a",
+              "surface-container-highest": "#e7e2db",
+              "on-tertiary-fixed": "#251a00",
+              "surface-bright": "#fef8f1",
+              "error": "#ba1a1a",
+              "on-tertiary": "#ffffff",
+              "secondary-container": "#aeefb3",
+              "on-primary-container": "#fff5f2",
+              "on-surface": "#1d1b17",
+              "on-tertiary-fixed-variant": "#5a4400",
+              "tertiary-fixed": "#ffdf97",
+              "surface-variant": "#e7e2db",
+              "error-container": "#ffdad6",
+              "surface-container-high": "#ede7e0",
+              "primary-fixed-dim": "#ffb598",
+              "outline": "#8c7167",
+              "surface": "#fef8f1",
+              "surface-dim": "#dfd9d2",
+              "on-primary-fixed": "#360f00",
+              "secondary-fixed": "#b1f2b5",
+              "surface-container-low": "#f9f3ec",
+              "tertiary-container": "#8d6c00",
+              "on-secondary": "#ffffff",
+              "inverse-primary": "#ffb598",
+              "outline-variant": "#e0c0b3",
+              "on-background": "#1d1b17"
+            },
+            fontFamily: {
+              "headline": ["Plus Jakarta Sans"],
+              "body": ["Be Vietnam Pro"],
+              "label": ["Be Vietnam Pro"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #fef8f1;
+            color: #1d1b17;
+            font-family: 'Be Vietnam Pro', sans-serif;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#fef8f1] dark:bg-stone-950 opacity-80 backdrop-blur-md"><div class="flex justify-between items-center px-12 h-20 max-w-screen-2xl mx-auto">
+<div class="flex items-center">
+<span class="text-2xl font-extrabold text-[#9C3800] dark:text-[#C44900] italic font-['Plus_Jakarta_Sans'] tracking-tight">Saffron &amp; Sage</span>
+</div>
+<nav class="hidden md:flex gap-8 items-center absolute left-1/2 -translate-x-1/2">
+<a class="text-[#9C3800] dark:text-[#C44900] border-b-2 border-[#9C3800] pb-1 font-['Plus_Jakarta_Sans'] font-bold tracking-tight" href="#">Menu</a>
+<a class="text-stone-600 dark:text-stone-400 font-medium font-['Plus_Jakarta_Sans'] hover:text-[#9C3800] transition-colors duration-300" href="#">Spesial</a>
+<a class="text-stone-600 dark:text-stone-400 font-medium font-['Plus_Jakarta_Sans'] hover:text-[#9C3800] transition-colors duration-300" href="#">Riwayat</a>
+<a class="text-stone-600 dark:text-stone-400 font-medium font-['Plus_Jakarta_Sans'] hover:text-[#9C3800] transition-colors duration-300" href="#">Bantuan</a>
+</nav>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/20 bg-primary/5">
+<span class="material-symbols-outlined text-[16px] text-primary">table_restaurant</span>
+<span class="text-xs font-bold text-primary tracking-wide font-['Plus_Jakarta_Sans']">Meja T12</span>
+</div><button class="scale-95 active:scale-90 transition-transform p-2 text-[#9C3800] dark:text-[#C44900] hover:bg-[#9C3800]/10 rounded-full">
+<span class="material-symbols-outlined">shopping_bag</span>
+</button>
+<button class="scale-95 active:scale-90 transition-transform p-2 text-[#9C3800] dark:text-[#C44900] hover:bg-[#9C3800]/10 rounded-full">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</div>
+<div class="h-px w-full bg-gradient-to-r from-transparent via-[#9C3800]/10 to-transparent"></div></header>
+<!-- Sidebar Navigation -->
+<aside class="h-full w-64 fixed left-0 top-0 pt-24 pb-8 flex flex-col bg-[#fef8f1] dark:bg-stone-900 shadow-[8px_0_24px_-4px_rgba(156,56,0,0.06)] z-40">
+<div class="px-8 mb-10">
+<h2 class="font-headline font-bold text-lg text-primary">Selamat Datang</h2>
+<p class="text-sm text-on-surface-variant leading-relaxed">Nikmati hidangan premium kami</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-4 px-6 py-3 bg-[#9C3800] text-white rounded-xl mx-4 my-1 font-['Plus_Jakarta_Sans'] font-semibold transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="restaurant_menu">restaurant_menu</span>
+<span>Semua</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 text-stone-600 dark:text-stone-400 hover:bg-stone-200/50 mx-4 my-1 rounded-xl font-['Plus_Jakarta_Sans'] hover:translate-x-1 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span>Beranda</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 text-stone-600 dark:text-stone-400 hover:bg-stone-200/50 mx-4 my-1 rounded-xl font-['Plus_Jakarta_Sans'] hover:translate-x-1 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="local_bar">local_bar</span>
+<span>Minuman</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 text-stone-600 dark:text-stone-400 hover:bg-stone-200/50 mx-4 my-1 rounded-xl font-['Plus_Jakarta_Sans'] hover:translate-x-1 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="icecream">icecream</span>
+<span>Dessert</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 text-stone-600 dark:text-stone-400 hover:bg-stone-200/50 mx-4 my-1 rounded-xl font-['Plus_Jakarta_Sans'] hover:translate-x-1 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="loyalty">loyalty</span>
+<span>Promo</span>
+</a>
+</nav>
+<div class="px-4 mt-auto">
+<button class="w-full flex items-center justify-center gap-2 bg-secondary text-on-secondary py-4 rounded-xl font-headline font-bold shadow-lg shadow-secondary/20 hover:bg-secondary/90 transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">shopping_cart</span>
+<span>Keranjang Saya</span>
+</button>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="ml-64 pt-28 px-12 pb-20 max-w-7xl">
+<!-- Editorial Header Section -->
+<section class="mb-16">
+<div class="flex items-end justify-between mb-8">
+<div class="max-w-xl">
+<span class="text-secondary font-bold tracking-widest uppercase text-xs mb-3 block">Koleksi Musim Ini</span>
+<h1 class="text-5xl font-headline font-extrabold text-on-surface leading-tight tracking-tight">Simfoni Rasa dalam <span class="text-primary italic">Setiap Gigitan</span></h1>
+</div>
+<div class="hidden lg:flex gap-2">
+<div class="px-4 py-2 rounded-full bg-primary text-on-primary text-sm font-bold">Populer</div>
+<div class="px-4 py-2 rounded-full bg-surface-container-highest text-on-surface-variant text-sm font-medium">Vegetarian</div>
+<div class="px-4 py-2 rounded-full bg-surface-container-highest text-on-surface-variant text-sm font-medium">Bebas Gluten</div>
+</div>
+</div>
+<!-- Hero Bento-style Highlight -->
+<div class="grid grid-cols-12 gap-6 h-[400px]">
+<div class="col-span-8 relative overflow-hidden rounded-3xl group">
+<img alt="Signature Dish" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Gourmet roasted lamb shank with rosemary sprigs and roasted root vegetables on a rustic ceramic plate, soft natural side lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVSSw9zy-0IAyJav4gI-Js97Z_BejsG_PX9OiBtxncuXaURktxT5v_6ma5Qv4aKjA4r84LI75fVfBWeGnXHg9fp6szEA_t9uxMTtM5K6wcdyl8ukFqE-Lm7CGHipQ4dP6PsBQTZnVc7VD1vbCKiBj5j2geAl6qB9JgDijK18hIJWNq7qSv6JvqNF-cys-Dll_pAdDRg73_Z9RwRAuj4kVhFOb_801hNRxH3xt1LVlU5I7CHRf2R524RFwKg0HFh3quI0AngulmV2YE"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/80 via-transparent to-transparent"></div>
+<div class="absolute bottom-8 left-8 text-white">
+<span class="bg-tertiary-fixed text-on-tertiary-fixed px-3 py-1 rounded-full text-xs font-bold mb-3 inline-block">Rekomendasi Chef</span>
+<h3 class="text-3xl font-headline font-bold">Lamb Shank &amp; Saffron Glaze</h3>
+<p class="text-white/80 max-w-md mt-2 font-body text-sm leading-relaxed">Daging domba pilihan yang dimasak perlahan selama 12 jam dengan rempah eksotis dan saus saffron premium.</p>
+</div>
+</div>
+<div class="col-span-4 bg-primary-container rounded-3xl p-8 flex flex-col justify-between text-on-primary-container relative overflow-hidden">
+<div class="relative z-10">
+<span class="text-xs font-bold uppercase tracking-widest opacity-80">Penawaran Spesial</span>
+<h3 class="text-4xl font-headline font-extrabold mt-2 leading-none">Diskon 25%</h3>
+<p class="mt-4 font-body text-sm opacity-90">Untuk pemesanan pertama Anda melalui aplikasi Saffron &amp; Sage.</p>
+</div>
+<button class="relative z-10 self-start bg-on-primary-container text-primary-container px-6 py-3 rounded-xl font-bold text-sm hover:shadow-xl transition-all">
+                        Klaim Promo
+                    </button>
+<!-- Decorative element -->
+<div class="absolute -right-8 -bottom-8 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
+</div>
+</div>
+</section>
+<!-- Menu Grid -->
+<section class="space-y-12">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+<!-- Item 1 -->
+<div class="group flex flex-col space-y-4">
+<div class="aspect-[4/5] overflow-hidden rounded-3xl bg-surface-container-low relative">
+<img alt="Healthy Bowl" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Vibrant healthy buddha bowl with fresh avocado slices, roasted chickpeas, quinoa, and kale on a light wooden background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5rnM0DUwn9IivRu5RFaGmKzQ5lJU3zvlGHK93PkExpazJmFlxDZEIFQZOd41Xx4bD02rrizekPR6klKKV0PkCxrdVZ2eEHcki5iIpECuO62Zx052_H8uMmNUofLtRMu3dhBmip86HL0HHLJNSRt9gwynck4AdEYmtbh04L5MmI3lV8osrNGk3QCnjd4X-5J1R7GQeBLEOIXTlIoJ4dx-fI61YUfCr43w7IcVU7eAeyn71T7B53V9efYefQVqrz-IAHeXUytg3HKVP"/>
+<div class="absolute top-4 right-4">
+<button class="w-10 h-10 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-primary shadow-lg active:scale-90 transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">favorite</span>
+</button>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-start">
+<h4 class="text-xl font-headline font-bold text-on-surface group-hover:text-primary transition-colors">Green Harvest Bowl</h4>
+<span class="text-lg font-headline font-bold text-primary">Rp 85k</span>
+</div>
+<p class="text-sm text-on-surface-variant font-body leading-relaxed line-clamp-2">Campuran segar quinoa organik, alpukat mentega, sayuran hijau musim dingin, dan saus lemon-tahini.</p>
+<div class="pt-4 flex items-center justify-between">
+<div class="flex items-center gap-1 text-tertiary">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-xs font-bold">4.8 (120+)</span>
+</div>
+<button class="bg-primary text-on-primary px-5 py-2 rounded-full text-sm font-bold hover:bg-primary-container transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">add</span>
+                                Tambah
+                            </button>
+</div>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="group flex flex-col space-y-4">
+<div class="aspect-[4/5] overflow-hidden rounded-3xl bg-surface-container-low relative">
+<img alt="Mediterranean Salad" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Exquisite Mediterranean salad with feta cheese crumbles, olives, cherry tomatoes, and cucumber in a ceramic bowl, airy high-end photography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDvLLWsS2f5wj_bntv4Wzm-AEuHEGRGexx_6i60kgf6oAGYLxFBqECYvO-SARMuUJE1oLbWuJOlXgGFYnFiwLkzB4s_MPxDcVXE3RA5iWaw6HcnXn7ZH0nuo5N8e9_zNoU1vzrMuLFZq_uYrj2HhOck9e1-Hy0ukZBXHwcd5CIucf-CF7cZTaAczkMPQfYeZ_9xWRnVDQEaHsrDSQS5xUCZXa3UonDuHz3mOEjwi32sNoD7Gn895lCCgXHl9RgRQxcrhWFE2L08228s"/>
+<div class="absolute top-4 right-4">
+<button class="w-10 h-10 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-primary shadow-lg active:scale-90 transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">favorite</span>
+</button>
+</div>
+<div class="absolute bottom-4 left-4 bg-secondary text-on-secondary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">Favorit Pelanggan</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-start">
+<h4 class="text-xl font-headline font-bold text-on-surface group-hover:text-primary transition-colors">Sage Feta Salad</h4>
+<span class="text-lg font-headline font-bold text-primary">Rp 72k</span>
+</div>
+<p class="text-sm text-on-surface-variant font-body leading-relaxed line-clamp-2">Keju feta Yunani otentik dengan zaitun Kalamata, tomat ceri organik, dan dressing balsamic rahasia chef.</p>
+<div class="pt-4 flex items-center justify-between">
+<div class="flex items-center gap-1 text-tertiary">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-xs font-bold">4.9 (240+)</span>
+</div>
+<button class="bg-primary text-on-primary px-5 py-2 rounded-full text-sm font-bold hover:bg-primary-container transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">add</span>
+                                Tambah
+                            </button>
+</div>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="group flex flex-col space-y-4">
+<div class="aspect-[4/5] overflow-hidden rounded-3xl bg-surface-container-low relative">
+<img alt="Truffle Pasta" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Gourmet creamy truffle pasta with shaved black truffles and parmesan shavings, elegant restaurant presentation, warm low-key lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAsSsdQ341KH9tG6du3hdwcRyrptkwLcMw1-S1gF1a31s89Cn7h76iXiTcypcK_5PD-GxdFA_Go1Ck6rPNJ6Th-4d8mJiAzx8VxduSCJYiuPPib_mL21nk0y4Xu2xZSqpyN_tHewVwrGpROPsbe8sCgSQjFae-hzzMStY0Gd4QR0NHxH7kgt3EPJF_pjxivO2ggtmYqI5rqxwuGi3SGCt4Lm3Y112zhjx2dPQcMn2U5AY-EzN1o1TeiDi38H_b7wJmUOXtOirL1BJCv"/>
+<div class="absolute top-4 right-4">
+<button class="w-10 h-10 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-primary shadow-lg active:scale-90 transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">favorite</span>
+</button>
+</div>
+<div class="absolute top-4 left-4 bg-tertiary text-on-tertiary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">Baru</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-start">
+<h4 class="text-xl font-headline font-bold text-on-surface group-hover:text-primary transition-colors">Truffle Cream Tagliatelle</h4>
+<span class="text-lg font-headline font-bold text-primary">Rp 145k</span>
+</div>
+<p class="text-sm text-on-surface-variant font-body leading-relaxed line-clamp-2">Pasta buatan tangan dengan saus krim truffle hitam Italia, jamur liar, dan keju Grana Padano berumur 24 bulan.</p>
+<div class="pt-4 flex items-center justify-between">
+<div class="flex items-center gap-1 text-tertiary">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-xs font-bold">5.0 (45)</span>
+</div>
+<button class="bg-primary text-on-primary px-5 py-2 rounded-full text-sm font-bold hover:bg-primary-container transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">add</span>
+                                Tambah
+                            </button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Category 2: Drinks -->
+<section class="mt-24 space-y-12">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Drink 1 -->
+<div class="group bg-surface-container-low p-4 rounded-3xl hover:bg-surface-container transition-colors">
+<div class="aspect-square overflow-hidden rounded-2xl mb-4">
+<img alt="Coffee" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Espresso tonic with a slice of orange and a sprig of rosemary in a tall crystal glass, condensation on glass, moody aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQov8hwgm-4qeUEXTFaj6QtD00I9hGhPn4Cqe9OlC6Z6IqsBKS8invfykRNgukfpLKaFVLNe4-0oJhoQKxTWKJ8gOVRg6R9WZG09ykI144Bizp4Gnql2mkkXsbdvT65b3pV3UQ_8HAxBphxBsyVKKpnI62tSzq4HzIL72CTnlgUZOp0AiAFLY0kg2ni9KgXp2iuYZNSjUX4l9fYbpG-_emGh1iWhMDPEwGk_QA-pnkj6X0jvCAyyi3trY82PHtlna9YU1aukSLy3r3"/>
+</div>
+<h5 class="font-headline font-bold text-on-surface">Spiced Saffron Latte</h5>
+<p class="text-xs text-on-surface-variant mt-1">Rp 48.000</p>
+<button class="w-full mt-4 py-2 border border-primary text-primary rounded-xl text-xs font-bold hover:bg-primary hover:text-on-primary transition-all">Pilih</button>
+</div>
+<!-- Drink 2 -->
+<div class="group bg-surface-container-low p-4 rounded-3xl hover:bg-surface-container transition-colors">
+<div class="aspect-square overflow-hidden rounded-2xl mb-4">
+<img alt="Mocktail" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Craft berry mocktail with floating berries and mint leaf, vibrant pink and purple colors, bright sunlight background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgAKnsUlmS3noL1Av7to1zWJahmMRa10Gl6r5ykVTRjBcGQeBmk1AAEMpouD-xNwL7K4ue844Nl3LbF6Vx5_kH1Qn-mK9f2ARtPXbQAhgRURlWQBchHtUBa7qQ_X_BcJkPY5MNFgZOrnYH1O4edVP2rsch1KZH6ZTFEPklzIyOSVHvEHKm5ilQQEDZvgNNydBx4d3t_x7WiOKe7YPFnbkH_HrUmA2Vz0sd0pMS9SHOfQIeH-0GtWshpd7R0PN55hVOXo0eaC2RUtiN"/>
+</div>
+<h5 class="font-headline font-bold text-on-surface">Wild Berry Elixir</h5>
+<p class="text-xs text-on-surface-variant mt-1">Rp 42.000</p>
+<button class="w-full mt-4 py-2 border border-primary text-primary rounded-xl text-xs font-bold hover:bg-primary hover:text-on-primary transition-all">Pilih</button>
+</div>
+<!-- Drink 3 -->
+<div class="group bg-surface-container-low p-4 rounded-3xl hover:bg-surface-container transition-colors">
+<div class="aspect-square overflow-hidden rounded-2xl mb-4">
+<img alt="Smoothie" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Healthy green smoothie in a glass jar with a bamboo straw, surrounded by kale and apples, clean minimalist style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBhzOBcqxhtydrCSOV9EPG75ST84xUjmZv3Q9Q8j6OdaxmcRO4Z4YE8DOesMWueksAdYCdLpNBDXxgyHnxwuZW51AjBL91q_65NW86WZueQ7T3aLvBI0Wlww_0Kt-4DlRhS-79ve6V-kXXz-FKr1b4CmaEnAUgY4MeU6kiMI7CLtXkc3lnTai0Tv-cwTd5S7bvDEsKMbb9mcNh-2rfou25fVMKlZFt78I83vDU2OE-ngGUwnWG5ZR-g37MVMC_Ys2DUa7krMMlE8Kjo"/>
+</div>
+<h5 class="font-headline font-bold text-on-surface">Avocado Silk</h5>
+<p class="text-xs text-on-surface-variant mt-1">Rp 55.000</p>
+<button class="w-full mt-4 py-2 border border-primary text-primary rounded-xl text-xs font-bold hover:bg-primary hover:text-on-primary transition-all">Pilih</button>
+</div>
+<!-- Drink 4 -->
+<div class="group bg-surface-container-low p-4 rounded-3xl hover:bg-surface-container transition-colors">
+<div class="aspect-square overflow-hidden rounded-2xl mb-4">
+<img alt="Tea" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Traditional hot tea service in a clear glass teapot with blooming tea flower, soft steam rising, tranquil atmosphere" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCEFTup1BdIRNThvuvmAtvpW4kdBt8qNti75igrwncRta3RWW71ZurEi-RMPxqa68bcAhYYcR0EOu8Oo0gHGcaf1G1Wl4wlDrSn7repGRxHTDEc8v5I1C_rDWdQzbAQktCrCHqPnArHPBKBQmCUMYJKg5SAiE_SgtQvS6h4hEROUbDSnRcYTBoIhqL3dj8wqpbFthE-Z1JWUVCy_ti_6pG25XD86MMglPBUoMzX-xDMQYqIKTfsD8FXu0EFw_U7cFWzN37Ig1eG4Xsj"/>
+</div>
+<h5 class="font-headline font-bold text-on-surface">Blooming Jasmine</h5>
+<p class="text-xs text-on-surface-variant mt-1">Rp 38.000</p>
+<button class="w-full mt-4 py-2 border border-primary text-primary rounded-xl text-xs font-bold hover:bg-primary hover:text-on-primary transition-all">Pilih</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="ml-64 bg-[#fef8f1] dark:bg-stone-950 border-t border-surface-container py-12">
+<div class="max-w-screen-xl mx-auto flex flex-col items-center gap-6">
+<div class="flex gap-8">
+<a class="text-stone-500 dark:text-stone-500 hover:text-[#9C3800] text-sm font-['Plus_Jakarta_Sans'] transition-colors" href="#">Tentang Kami</a>
+<a class="text-stone-500 dark:text-stone-500 hover:text-[#9C3800] text-sm font-['Plus_Jakarta_Sans'] transition-colors" href="#">Kebijakan Privasi</a>
+<a class="text-stone-500 dark:text-stone-500 hover:text-[#9C3800] text-sm font-['Plus_Jakarta_Sans'] transition-colors" href="#">Kontak</a>
+<a class="text-stone-500 dark:text-stone-500 hover:text-[#9C3800] text-sm font-['Plus_Jakarta_Sans'] transition-colors" href="#">Lokasi</a>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-lg font-bold text-[#9C3800] font-headline italic">Saffron &amp; Sage</span>
+<span class="text-xs text-stone-400">|</span>
+<p class="text-sm font-['Plus_Jakarta_Sans'] text-stone-500 dark:text-stone-500">© 2024 Saffron &amp; Sage Culinary Editorial. Rasa yang Bercerita.</p>
+</div>
+</div>
+</footer>
+</body></html>

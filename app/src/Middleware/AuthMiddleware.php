@@ -5,7 +5,7 @@ namespace App\Middleware;
 use App\Helpers\FlashMessage;
 
 class AuthMiddleware {
-    public function handle() {
+    public function handle($role = null) {
         // Cek apakah session user_id ada
         if (!isset($_SESSION['user_id'])) {
             // Tampilkan pesan error
