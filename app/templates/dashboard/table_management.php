@@ -174,6 +174,7 @@
     <!-- Background Decoration -->
     <div class="fixed top-0 right-0 -z-10 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
     <div class="fixed bottom-0 lg:left-64 -z-10 w-[300px] h-[300px] bg-secondary/5 rounded-full blur-[100px] pointer-events-none"></div>
+    <?php include 'partials/includes/js.php'; ?>
 </body>
 
 </html>

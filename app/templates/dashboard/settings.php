@@ -219,9 +219,17 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <button class="p-2 text-on-surface-variant hover:text-primary transition-colors opacity-0 group-hover:opacity-100">
-                                                    <span class="material-symbols-outlined">edit</span>
-                                                </button>
+                                                <div class="flex gap-1">
+                                                    <button class="p-2 text-on-surface-variant hover:text-primary hover:bg-primary/10 rounded-full transition-all opacity-0 group-hover:opacity-100" title="Edit">
+                                                        <span class="material-symbols-outlined">edit</span>
+                                                    </button>
+                                                    <form id="delete-payment-<?= $method->id ?>" action="<?= BASE_URL ?>/dashboard/settings/delete-payment-method" method="POST" class="inline">
+                                                        <input type="hidden" name="id" value="<?= $method->id ?>">
+                                                        <button type="button" onclick="confirmDelete('delete-payment-<?= $method->id ?>', 'Metode pembayaran <?= addslashes($method->name) ?> akan dihapus permanen!')" class="p-2 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-full transition-all opacity-0 group-hover:opacity-100" title="Hapus">
+                                                            <span class="material-symbols-outlined">delete</span>
+                                                        </button>
+                                                    </form>
+                                                </div>
                                             </div>
                                         <?php endforeach; ?>
                                     <?php endif; ?>
@@ -265,7 +273,7 @@
                                                         <p class="text-[10px] text-on-surface-variant"><?= htmlspecialchars($category->description) ?></p>
                                                     </div>
                                                 </div>
-                                                <button @click="showCategoryModal = true" class="p-2 text-on-surface-variant hover:text-primary transition-colors opacity-0 group-hover:opacity-100">
+                                                <button @click="showCategoryModal = true" class="p-2 text-on-surface-variant hover:text-primary hover:bg-primary/10 rounded-full transition-all opacity-0 group-hover:opacity-100" title="Edit">
                                                     <span class="material-symbols-outlined">edit</span>
                                                 </button>
                                             </div>
@@ -384,6 +392,7 @@
             </div>
         </div>
     </template>
+    <?php include 'partials/includes/js.php'; ?>
 </body>
 
 </html>
