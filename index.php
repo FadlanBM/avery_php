@@ -48,7 +48,16 @@ $router->get('/dashboard/table-management/add', [\App\Controllers\Tablemanagemen
 $router->get('/dashboard/settings', [\App\Controllers\SettingController::class, 'index'], [\App\Middleware\SuperAdminMiddleware::class]);
 $router->post('/dashboard/settings/create-payment-method', [\App\Controllers\SettingController::class, 'createPayment'], [\App\Middleware\SuperAdminMiddleware::class]);
 $router->post('/dashboard/settings/delete-payment-method', [\App\Controllers\SettingController::class, 'deletePayment'], [\App\Middleware\SuperAdminMiddleware::class]);
-
+$router->post('/dashboard/settings/create-category-menu', [\App\Controllers\SettingController::class, 'createCategory'], [\App\Middleware\SuperAdminMiddleware::class]);
+$router->post('/dashboard/settings/delete-category-menu', [\App\Controllers\SettingController::class, 'deleteCategory'], [\App\Middleware\SuperAdminMiddleware::class]);
+$router->get('/dashboard/settings/get-category', [\App\Controllers\SettingController::class, 'getCategoryById'], [\App\Middleware\SuperAdminMiddleware::class]);
+$router->post('/dashboard/settings/update-category-menu', [\App\Controllers\SettingController::class, 'updateCategory'], [\App\Middleware\SuperAdminMiddleware::class]);
+$router->post('/dashboard/settings/create-employee', [\App\Controllers\SettingController::class, 'createEmployee'], [\App\Middleware\SuperAdminMiddleware::class]);
+$router->get('/dashboard/settings/get-employee', [\App\Controllers\SettingController::class, 'getEmployeeById'], [\App\Middleware\SuperAdminMiddleware::class]);
+$router->post('/dashboard/settings/update-employee', [\App\Controllers\SettingController::class, 'updateEmployee'], [\App\Middleware\SuperAdminMiddleware::class]);
+$router->post('/dashboard/settings/delete-employee', [\App\Controllers\SettingController::class, 'deleteEmployee'], [\App\Middleware\SuperAdminMiddleware::class]);
+$router->post('/dashboard/settings/update-profile', [\App\Controllers\SettingController::class, 'updateProfile'], [\App\Middleware\SuperAdminMiddleware::class]);
+$router->post('/dashboard/settings/update-open-setting', [\App\Controllers\SettingController::class, 'updateOpenSetting'], [\App\Middleware\SuperAdminMiddleware::class]);
 // Employee Dashboard Routes
 $router->get('/employee-dashboard/scan-qr', [\App\Controllers\EmployeeDashboardController::class, 'scanQr']);
 $router->get('/employee-dashboard/pembayaran-tunai', [\App\Controllers\EmployeeDashboardController::class, 'pembayaranTunai']);
