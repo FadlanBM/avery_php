@@ -125,6 +125,35 @@ abstract class Model implements \ArrayAccess
 
     public function __get($key) { return $this->attributes[$key] ?? null; }
     public function __set($key, $value) { $this->attributes[$key] = $value; }
+    public function __isset($key) { return isset($this->attributes[$key]); }
+
+    public function getAttributes()
+    {
+        return $this->attributes;
+    }
+
+    public function updateOrCreate(array $attributes, array $values)
+    {
+        $query = "SELECT * FROM {$this->table} WHERE ";
+        $params = [];
+        $conditions = [];
+        foreach ($attributes as $key => $value) {
+            $conditions[] = "{$key} = :attr_{$key}";
+            $params["attr_{$key}"] = $value;
+        }
+        $query .= implode(' AND ', $conditions) . " LIMIT 1";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->execute($params);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($result) {
+            $this->update($result[$this->primaryKey], $values);
+            return $this->find($result[$this->primaryKey]);
+        } else {
+            return $this->create(array_merge($attributes, $values));
+        }
+    }
 
     public static function query() { return new static(); }
 }

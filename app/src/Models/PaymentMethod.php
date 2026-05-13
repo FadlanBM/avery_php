@@ -25,4 +25,24 @@ class PaymentMethod extends Model
             'id' => $id,
         ]);
     }
+
+    public function updatePaymentMethod($id, $name, $isActive, $createdBy)
+    {
+        $stmt = $this->db->prepare("UPDATE {$this->table} SET name = :name, is_active = :is_active, created_by = :created_by WHERE id = :id");
+        $stmt->execute([
+            'id' => $id,
+            'name' => $name,
+            'is_active' => $isActive,
+            'created_by' => $createdBy
+        ]);
+    }
+
+    public function findPaymentMethodById($id)
+    {
+        $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE id = :id");
+        $stmt->execute([
+            'id' => $id
+        ]);
+        return $stmt->fetch();
+    }
 }
