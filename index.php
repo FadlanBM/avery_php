@@ -44,7 +44,13 @@ $router->get('/dashboard', [\App\Controllers\DashboardController::class, 'index'
 $router->get('/dashboard/menu-management', [\App\Controllers\MenumanagementController::class, 'index'], [\App\Middleware\SuperAdminMiddleware::class]);
 $router->get('/dashboard/menu-management/add', [\App\Controllers\MenumanagementController::class, 'addMenu'], [\App\Middleware\SuperAdminMiddleware::class]);
 $router->get('/dashboard/table-management', [\App\Controllers\TablemanagementController::class, 'index'], [\App\Middleware\SuperAdminMiddleware::class]);
-$router->get('/dashboard/table-management/add', [\App\Controllers\TablemanagementController::class, 'addTable'], [\App\Middleware\SuperAdminMiddleware::class]);
+$router->post('/dashboard/table-management/create-area', [\App\Controllers\TablemanagementController::class, 'createArea'], [\App\Middleware\SuperAdminMiddleware::class]);
+$router->post('/dashboard/table-management/update-area', [\App\Controllers\TablemanagementController::class, 'updateArea'], [\App\Middleware\SuperAdminMiddleware::class]);
+$router->get('/dashboard/table-management/get-area', [\App\Controllers\TablemanagementController::class, 'getAreaById'], [\App\Middleware\SuperAdminMiddleware::class]);
+$router->post('/dashboard/table-management/delete-area', [\App\Controllers\TablemanagementController::class, 'deleteArea'], [\App\Middleware\SuperAdminMiddleware::class]);
+$router->post('/dashboard/table-management/create-table', [\App\Controllers\TablemanagementController::class, 'createTable'], [\App\Middleware\SuperAdminMiddleware::class]);
+$router->get('/dashboard/table-management/get-tables', [\App\Controllers\TablemanagementController::class, 'getTablesByArea'], [\App\Middleware\SuperAdminMiddleware::class]);
+$router->post('/dashboard/table-management/delete-table', [\App\Controllers\TablemanagementController::class, 'deleteTable'], [\App\Middleware\SuperAdminMiddleware::class]);
 $router->get('/dashboard/settings', [\App\Controllers\SettingController::class, 'index'], [\App\Middleware\SuperAdminMiddleware::class]);
 $router->post('/dashboard/settings/create-payment-method', [\App\Controllers\SettingController::class, 'createPayment'], [\App\Middleware\SuperAdminMiddleware::class]);
 $router->post('/dashboard/settings/delete-payment-method', [\App\Controllers\SettingController::class, 'deletePayment'], [\App\Middleware\SuperAdminMiddleware::class]);
