@@ -43,6 +43,11 @@ $router->get('/order-tracking', [\App\Controllers\OrderController::class, 'index
 $router->get('/dashboard', [\App\Controllers\DashboardController::class, 'index'], [\App\Middleware\SuperAdminMiddleware::class]);
 $router->get('/dashboard/menu-management', [\App\Controllers\MenumanagementController::class, 'index'], [\App\Middleware\SuperAdminMiddleware::class]);
 $router->get('/dashboard/menu-management/add', [\App\Controllers\MenumanagementController::class, 'addMenu'], [\App\Middleware\SuperAdminMiddleware::class]);
+$router->post('/dashboard/menu-management/add', [\App\Controllers\MenumanagementController::class, 'post'], [\App\Middleware\SuperAdminMiddleware::class]);
+$router->get('/dashboard/menu-management/edit', [\App\Controllers\MenumanagementController::class, 'editMenu'], [\App\Middleware\SuperAdminMiddleware::class]);
+$router->post('/dashboard/menu-management/edit', [\App\Controllers\MenumanagementController::class, 'updateMenu'], [\App\Middleware\SuperAdminMiddleware::class]);
+$router->post('/dashboard/menu-management/delete', [\App\Controllers\MenumanagementController::class, 'deleteMenu'], [\App\Middleware\SuperAdminMiddleware::class]);
+$router->post('/dashboard/menu-management/delete-asset', [\App\Controllers\MenumanagementController::class, 'deleteMenuAsset'], [\App\Middleware\SuperAdminMiddleware::class]);
 $router->get('/dashboard/table-management', [\App\Controllers\TablemanagementController::class, 'index'], [\App\Middleware\SuperAdminMiddleware::class]);
 $router->post('/dashboard/table-management/create-area', [\App\Controllers\TablemanagementController::class, 'createArea'], [\App\Middleware\SuperAdminMiddleware::class]);
 $router->post('/dashboard/table-management/update-area', [\App\Controllers\TablemanagementController::class, 'updateArea'], [\App\Middleware\SuperAdminMiddleware::class]);
