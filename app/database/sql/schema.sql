@@ -153,3 +153,44 @@ CREATE TABLE IF NOT EXISTS restaurant_open_setting (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_restaurant_setting_id_restaurant_open_setting FOREIGN KEY (restaurant_setting_id) REFERENCES restaurant_setting(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 );
+
+-- 13. Table: cart
+CREATE TABLE IF NOT EXISTS cart (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT DEFAULT NULL,
+    session_id VARCHAR(255) DEFAULT NULL,
+    restaurant_table_id INT,
+    status VARCHAR(50) NOT NULL DEFAULT 'active',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_cart_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE NO ACTION,
+    CONSTRAINT fk_cart_restaurant_table_id FOREIGN KEY (restaurant_table_id) REFERENCES restaurant_table(id) ON DELETE SET NULL ON UPDATE NO ACTION,
+    INDEX idx_cart_session_id (session_id)
+);
+
+-- 14. Table: cart_item
+CREATE TABLE IF NOT EXISTS cart_item (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    cart_id INT NOT NULL,
+    restaurant_menu_id INT NOT NULL,
+    quantity INT NOT NULL DEFAULT 1,
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_cart_item_cart_id FOREIGN KEY (cart_id) REFERENCES cart(id) ON DELETE CASCADE ON UPDATE NO ACTION,
+    CONSTRAINT fk_cart_item_restaurant_menu_id FOREIGN KEY (restaurant_menu_id) REFERENCES restaurant_menu(id) ON DELETE CASCADE ON UPDATE NO ACTION
+);
+
+-- 15. Table: restaurant_menu_like
+CREATE TABLE IF NOT EXISTS restaurant_menu_like (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT DEFAULT NULL,
+    session_id VARCHAR(255) DEFAULT NULL,
+    restaurant_menu_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_restaurant_menu_like_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE NO ACTION,
+    CONSTRAINT fk_restaurant_menu_like_restaurant_menu_id FOREIGN KEY (restaurant_menu_id) REFERENCES restaurant_menu(id) ON DELETE CASCADE ON UPDATE NO ACTION,
+    UNIQUE INDEX idx_like_session_menu (session_id, restaurant_menu_id)
+);
+

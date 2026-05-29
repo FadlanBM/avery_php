@@ -214,4 +214,30 @@ class TablemanagementController extends Controller
             exit;
         }
     }
+
+    public function exportQr()
+    {
+        $areaId = $_GET['area_id'] ?? null;
+
+        $areaModel = new RestaurantTableArea();
+        $tableModel = new \App\Models\RestaurantTable();
+
+        $area = null;
+        if ($areaId) {
+            $area = $areaModel->find($areaId);
+            $tables = $tableModel->getTablesByArea($areaId);
+        } else {
+            $tables = $tableModel->all();
+        }
+
+        $restaurantModel = new \App\Models\RestaurantSetting();
+        $restaurant = $restaurantModel->query()->firstWhere('id', 1);
+
+        return $this->view('dashboard/export_qr_pdf', [
+            'title' => 'Cetak QR Code Meja',
+            'area' => $area,
+            'tables' => $tables,
+            'restaurant' => $restaurant
+        ]);
+    }
 }

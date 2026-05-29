@@ -45,6 +45,13 @@ class RestaurantTable extends Model
         return $stmt->fetch();
     }
 
+    public function findByIdentityCode($identityCode)
+    {
+        $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE identity_code = :identity_code LIMIT 1");
+        $stmt->execute(['identity_code' => $identityCode]);
+        return $stmt->fetch();
+    }
+
     public function countTablesByArea($areaId)
     {
         $stmt = $this->db->prepare("SELECT COUNT(*) as count FROM {$this->table} WHERE restaurant_table_area_id = :area_id");
