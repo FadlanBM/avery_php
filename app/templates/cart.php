@@ -133,14 +133,6 @@ $tableNumber = $_SESSION['table_number'] ?? null;
             <a href="#">Syarat & Ketentuan</a> Saffron & Sage.
           </p>
         </div>
-
-        <div class="promo-card">
-          <div class="promo-content">
-            <span class="material-symbols-outlined">loyalty</span>
-            <span>Gunakan Promo</span>
-          </div>
-          <span class="material-symbols-outlined">chevron_right</span>
-        </div>
       </aside>
     </div>
   </main>
@@ -169,43 +161,47 @@ $tableNumber = $_SESSION['table_number'] ?? null;
     </div>
   </footer>
 
-<script>
-(function() {
-  const BASE_URL = '<?= BASE_URL ?>';
-  const TAX_RATE = 0.10;
-  const SERVICE_CHARGE = 5000;
+  <script>
+    (function() {
+      const BASE_URL = '<?= BASE_URL ?>';
+      const TAX_RATE = 0.10;
+      const SERVICE_CHARGE = 5000;
 
-  function showToast(message, duration = 2500) {
-    const toast = document.getElementById('toast');
-    const msgEl = document.getElementById('toast-message');
-    msgEl.textContent = message;
-    toast.style.display = 'flex';
-    setTimeout(() => { toast.style.display = 'none'; }, duration);
-  }
+      function showToast(message, duration = 2500) {
+        const toast = document.getElementById('toast');
+        const msgEl = document.getElementById('toast-message');
+        msgEl.textContent = message;
+        toast.style.display = 'flex';
+        setTimeout(() => {
+          toast.style.display = 'none';
+        }, duration);
+      }
 
-  function formatRupiah(amount) {
-    return 'Rp ' + Math.round(amount).toLocaleString('id-ID');
-  }
+      function formatRupiah(amount) {
+        return 'Rp ' + Math.round(amount).toLocaleString('id-ID');
+      }
 
-  async function apiPost(url, data) {
-    const response = await fetch(BASE_URL + url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams(data).toString(),
-    });
-    return response.json();
-  }
+      async function apiPost(url, data) {
+        const response = await fetch(BASE_URL + url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: new URLSearchParams(data).toString(),
+        });
+        return response.json();
+      }
 
-  async function refreshCart() {
-    const response = await fetch(BASE_URL + '/cart/api');
-    const data = await response.json();
-    if (!data.success) return;
+      async function refreshCart() {
+        const response = await fetch(BASE_URL + '/cart/api');
+        const data = await response.json();
+        if (!data.success) return;
 
-    const listEl = document.getElementById('cart-items-list');
-    const emptyState = document.getElementById('empty-cart-state');
+        const listEl = document.getElementById('cart-items-list');
+        const emptyState = document.getElementById('empty-cart-state');
 
-    if (data.items.length === 0) {
-      listEl.innerHTML = `
+        if (data.items.length === 0) {
+          listEl.innerHTML = `
         <div class="empty-cart-state" id="empty-cart-state">
           <span class="material-symbols-outlined empty-icon">shopping_cart</span>
           <h3>Keranjang Anda kosong</h3>
@@ -215,11 +211,11 @@ $tableNumber = $_SESSION['table_number'] ?? null;
             Lihat Menu
           </a>
         </div>`;
-    } else {
-      let html = '';
-      data.items.forEach(item => {
-        const imgSrc = BASE_URL + '/' + (item.image_path || 'assets/images/menu/quinoa_bowl.jpg').replace(/^\/+/, '');
-        html += `
+        } else {
+          let html = '';
+          data.items.forEach(item => {
+            const imgSrc = BASE_URL + '/' + (item.image_path || 'assets/images/menu/quinoa_bowl.jpg').replace(/^\/+/, '');
+            html += `
         <div class="cart-item-card" data-item-id="${item.id}" data-menu-id="${item.menu_id}">
           <div class="item-visual">
             <img src="${imgSrc}" alt="${item.name}">
@@ -247,151 +243,184 @@ $tableNumber = $_SESSION['table_number'] ?? null;
             </button>
           </div>
         </div>`;
+          });
+          listEl.innerHTML = html;
+        }
+
+        // Update summary
+        const subtotal = data.total;
+        const tax = subtotal * TAX_RATE;
+        const grandTotal = subtotal + tax + SERVICE_CHARGE;
+
+        document.getElementById('summary-subtotal').textContent = formatRupiah(subtotal);
+        document.getElementById('summary-tax').textContent = formatRupiah(tax);
+        document.getElementById('summary-service').textContent = formatRupiah(SERVICE_CHARGE);
+        document.getElementById('summary-total').textContent = formatRupiah(grandTotal);
+
+        // Update badge
+        const badge = document.getElementById('cart-badge-header');
+        if (badge) {
+          badge.textContent = data.itemCount;
+          badge.style.display = data.itemCount > 0 ? 'inline-flex' : 'none';
+        }
+      }
+
+      // Increase quantity
+      document.addEventListener('click', function(e) {
+        if (e.target.closest('.qty-increase')) {
+          const itemId = e.target.closest('.qty-increase').dataset.itemId;
+          apiPost('/cart/update', {
+            item_id: itemId,
+            action: 'increment'
+          }).then(() => refreshCart());
+        }
       });
-      listEl.innerHTML = html;
-    }
 
-    // Update summary
-    const subtotal = data.total;
-    const tax = subtotal * TAX_RATE;
-    const grandTotal = subtotal + tax + SERVICE_CHARGE;
-
-    document.getElementById('summary-subtotal').textContent = formatRupiah(subtotal);
-    document.getElementById('summary-tax').textContent = formatRupiah(tax);
-    document.getElementById('summary-service').textContent = formatRupiah(SERVICE_CHARGE);
-    document.getElementById('summary-total').textContent = formatRupiah(grandTotal);
-
-    // Update badge
-    const badge = document.getElementById('cart-badge-header');
-    if (badge) {
-      badge.textContent = data.itemCount;
-      badge.style.display = data.itemCount > 0 ? 'inline-flex' : 'none';
-    }
-  }
-
-  // Increase quantity
-  document.addEventListener('click', function(e) {
-    if (e.target.closest('.qty-increase')) {
-      const itemId = e.target.closest('.qty-increase').dataset.itemId;
-      apiPost('/cart/update', { item_id: itemId, action: 'increment' }).then(() => refreshCart());
-    }
-  });
-
-  // Decrease quantity
-  document.addEventListener('click', function(e) {
-    if (e.target.closest('.qty-decrease')) {
-      const itemId = e.target.closest('.qty-decrease').dataset.itemId;
-      apiPost('/cart/update', { item_id: itemId, action: 'decrement' }).then(() => refreshCart());
-    }
-  });
-
-  // Remove item
-  document.addEventListener('click', function(e) {
-    if (e.target.closest('.remove-item-btn')) {
-      const itemId = e.target.closest('.remove-item-btn').dataset.itemId;
-      apiPost('/cart/remove', { item_id: itemId }).then(() => {
-        showToast('Item dihapus dari keranjang');
-        refreshCart();
+      // Decrease quantity
+      document.addEventListener('click', function(e) {
+        if (e.target.closest('.qty-decrease')) {
+          const itemId = e.target.closest('.qty-decrease').dataset.itemId;
+          apiPost('/cart/update', {
+            item_id: itemId,
+            action: 'decrement'
+          }).then(() => refreshCart());
+        }
       });
+
+      // Remove item
+      document.addEventListener('click', function(e) {
+        if (e.target.closest('.remove-item-btn')) {
+          const itemId = e.target.closest('.remove-item-btn').dataset.itemId;
+          apiPost('/cart/remove', {
+            item_id: itemId
+          }).then(() => {
+            showToast('Item dihapus dari keranjang');
+            refreshCart();
+          });
+        }
+      });
+
+      // Note input (save on blur)
+      document.addEventListener('focusout', function(e) {
+        if (e.target.classList.contains('note-input') && e.target.dataset.itemId) {
+          const itemId = e.target.dataset.itemId;
+          const notes = e.target.value;
+          apiPost('/cart/update', {
+            item_id: itemId,
+            quantity: 0,
+            action: 'note',
+            notes: notes
+          });
+        }
+      });
+
+      // Checkout button
+      document.getElementById('btn-checkout').addEventListener('click', function() {
+        showToast('Menuju ke proses pemesanan...');
+        setTimeout(() => {
+          window.location.href = BASE_URL + '/checkout';
+        }, 500);
+      });
+    })();
+  </script>
+
+  <style>
+    .empty-cart-state {
+      text-align: center;
+      padding: 3rem 1rem;
     }
-  });
 
-  // Note input (save on blur)
-  document.addEventListener('focusout', function(e) {
-    if (e.target.classList.contains('note-input') && e.target.dataset.itemId) {
-      const itemId = e.target.dataset.itemId;
-      const notes = e.target.value;
-      apiPost('/cart/update', { item_id: itemId, quantity: 0, action: 'note', notes: notes });
+    .empty-cart-state .empty-icon {
+      font-size: 4rem;
+      color: #c8b89a;
     }
-  });
 
-  // Checkout button
-  document.getElementById('btn-checkout').addEventListener('click', function() {
-    showToast('Menuju ke proses pemesanan...');
-    // TODO: redirect to checkout page
-  });
-})();
-</script>
+    .empty-cart-state h3 {
+      font-size: 1.25rem;
+      margin: 1rem 0 0.5rem;
+      color: var(--text-primary, #1d1b17);
+    }
 
-<style>
-  .empty-cart-state {
-    text-align: center;
-    padding: 3rem 1rem;
-  }
-  .empty-cart-state .empty-icon {
-    font-size: 4rem;
-    color: #c8b89a;
-  }
-  .empty-cart-state h3 {
-    font-size: 1.25rem;
-    margin: 1rem 0 0.5rem;
-    color: var(--text-primary, #1d1b17);
-  }
-  .empty-cart-state p {
-    color: var(--text-secondary, #78736c);
-    font-size: 0.9rem;
-    margin-bottom: 1rem;
-  }
-  .remove-item-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    background: none;
-    border: none;
-    color: #d9534f;
-    font-size: 0.8rem;
-    cursor: pointer;
-    margin-top: 0.5rem;
-    padding: 4px 8px;
-    border-radius: 6px;
-    transition: background 0.2s;
-  }
-  .remove-item-btn:hover {
-    background: #fde8e8;
-  }
-  .remove-item-btn .material-symbols-outlined {
-    font-size: 1rem;
-  }
-  .cart-badge {
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    background: #9c3800;
-    color: #fef8f1;
-    font-size: 0.65rem;
-    font-weight: 700;
-    min-width: 18px;
-    height: 18px;
-    border-radius: 9px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .action-icon {
-    position: relative;
-  }
-  .toast-notification {
-    position: fixed;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #1d1b17;
-    color: #fef8f1;
-    padding: 0.75rem 1.5rem;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.9rem;
-    z-index: 9999;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-    animation: slideUp 0.3s ease;
-  }
-  @keyframes slideUp {
-    from { transform: translateX(-50%) translateY(20px); opacity: 0; }
-    to { transform: translateX(-50%) translateY(0); opacity: 1; }
-  }
-</style>
+    .empty-cart-state p {
+      color: var(--text-secondary, #78736c);
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .remove-item-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: none;
+      border: none;
+      color: #d9534f;
+      font-size: 0.8rem;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+
+    .remove-item-btn:hover {
+      background: #fde8e8;
+    }
+
+    .remove-item-btn .material-symbols-outlined {
+      font-size: 1rem;
+    }
+
+    .cart-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background: #9c3800;
+      color: #fef8f1;
+      font-size: 0.65rem;
+      font-weight: 700;
+      min-width: 18px;
+      height: 18px;
+      border-radius: 9px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .action-icon {
+      position: relative;
+    }
+
+    .toast-notification {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1d1b17;
+      color: #fef8f1;
+      padding: 0.75rem 1.5rem;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      z-index: 9999;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateX(-50%) translateY(20px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+      }
+    }
+  </style>
 
 </body>
+
 </html>

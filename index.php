@@ -49,6 +49,11 @@ $router->get('/cart/api', [\App\Controllers\CartController::class, 'getCartApi']
 $router->post('/like/toggle', [\App\Controllers\MenuLikeController::class, 'toggle']);
 $router->get('/order-tracking', [\App\Controllers\OrderController::class, 'index']);
 
+// Checkout Routes
+$router->get('/checkout', [\App\Controllers\CheckoutController::class, 'index'], [\App\Middleware\TableAccessMiddleware::class]);
+$router->post('/checkout/process', [\App\Controllers\CheckoutController::class, 'process'], [\App\Middleware\TableAccessMiddleware::class]);
+$router->get('/order/status', [\App\Controllers\OrderController::class, 'getStatus']);
+
 // Dashboard protected with AuthMiddleware
 $router->get('/dashboard', [\App\Controllers\DashboardController::class, 'index'], [\App\Middleware\SuperAdminMiddleware::class]);
 $router->get('/dashboard/menu-management', [\App\Controllers\MenumanagementController::class, 'index'], [\App\Middleware\SuperAdminMiddleware::class]);
