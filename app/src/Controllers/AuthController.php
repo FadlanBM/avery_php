@@ -70,7 +70,7 @@ class AuthController extends Controller
             if ($role["name"] == "superadmin") {
                 header('Location: ' . BASE_URL . '/dashboard');
             } else if ($role["name"] == "cashier") {
-                header('Location: ' . BASE_URL . '/cashier');
+                header('Location: ' . BASE_URL . '/employee-dashboard/scan-qr');
             } else {
                 header('Location: ' . BASE_URL);
             }

@@ -136,6 +136,51 @@
     },
     isTableUsed(table) {
         return table.is_use === true || table.is_use == 1 || table.is_use === 't' || table.is_use === 'true';
+    },
+    showQrCode(table) {
+        const tableUrl = table.identity_code;
+        const qrImageUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(tableUrl);
+        
+        Swal.fire({
+            title: 'QR Code Meja ' + table.nomor_meja,
+            text: 'Scan untuk mengakses menu digital meja ' + table.nomor_meja,
+            imageUrl: qrImageUrl,
+            imageWidth: 200,
+            imageHeight: 200,
+            imageAlt: 'QR Code Meja ' + table.nomor_meja,
+            showDenyButton: true,
+            confirmButtonText: 'Tutup',
+            denyButtonText: 'Unduh QR',
+            confirmButtonColor: '#9c3800',
+            denyButtonColor: '#594238',
+            background: '#fef8f1',
+            color: '#1d1b17',
+            customClass: {
+                popup: 'rounded-[2rem] p-6 shadow-2xl border border-white/20',
+                confirmButton: 'rounded-xl px-6 py-3 font-bold transition-all hover:scale-105 active:scale-95',
+                denyButton: 'rounded-xl px-6 py-3 font-bold transition-all hover:scale-105 active:scale-95'
+            }
+        }).then((result) => {
+            if (result.isDenied) {
+                fetch(qrImageUrl)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.style.display = 'none';
+                        a.href = url;
+                        a.download = 'QR_Meja_' + table.nomor_meja + '.png';
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(a);
+                    })
+                    .catch(err => {
+                        console.error('Gagal mengunduh QR Code:', err);
+                        window.open(qrImageUrl, '_blank');
+                    });
+            }
+        });
     }
 }">
     <?php $activeMenu = 'table-management'; ?>
@@ -198,7 +243,7 @@
             <!-- Modal Body -->
             <form action="<?= BASE_URL ?>/dashboard/table-management/create-table" method="POST" class="p-6 space-y-5">
                 <input type="hidden" name="area_id" :value="newTable.area_id" />
-                
+
                 <div class="space-y-2">
                     <label class="block text-sm font-bold text-on-surface-variant ml-1">Nomor Meja</label>
                     <div class="relative">
@@ -302,6 +347,10 @@
                         <p class="text-sm text-stone-500" x-text="selectedPlace?.description"></p>
                     </div>
                     <div class="flex gap-3">
+                        <a :href="'<?= BASE_URL ?>/dashboard/table-management/export-qr?area_id=' + selectedPlace?.id" target="_blank" class="bg-primary text-on-primary px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-primary/20 hover:opacity-90 transition-all text-sm active:scale-95">
+                            <span class="material-symbols-outlined text-base">qr_code_2</span>
+                            Export QR
+                        </a>
                         <button @click="openAddTable()" class="bg-primary text-on-primary px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-primary/20 hover:opacity-90 transition-all text-sm active:scale-95">
                             <span class="material-symbols-outlined text-base">add</span>
                             Tambah Meja
@@ -322,23 +371,26 @@
                             <p class="text-xs text-stone-400 mt-1">Klik "+ Tambah Meja" untuk menambahkan meja baru.</p>
                         </div>
                     </template>
-                    
+
                     <template x-for="table in tables" :key="table.id">
                         <div class="bg-surface-container-lowest rounded-2xl p-4 border border-stone-200/50 hover:shadow-lg hover:border-primary/20 transition-all text-center cursor-pointer group relative">
                             <!-- Delete Button (Only visible on hover) -->
                             <button @click.stop="confirmDeleteTable(table.id, table.nomor_meja)" class="absolute top-2 right-2 p-1.5 bg-red-50 text-stone-400 hover:text-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
                                 <span class="material-symbols-outlined text-sm">delete</span>
                             </button>
-                            
+                            <button @click.stop="showQrCode(table)" class="absolute top-2 right-10 p-1.5 bg-stone-50 text-stone-400 hover:text-primary rounded-full opacity-0 group-hover:opacity-100 transition-opacity" title="Lihat QR Code">
+                                <span class="material-symbols-outlined text-sm">qr_code_2</span>
+                            </button>
+
                             <div class="w-12 h-12 mx-auto rounded-xl flex items-center justify-center mb-3 transition-colors"
-                                 :class="isTableActive(table) ? (isTableUsed(table) ? 'bg-primary-container/20 text-primary' : 'bg-secondary-container/30 text-secondary') : 'bg-stone-100 text-stone-400'">
+                                :class="isTableActive(table) ? (isTableUsed(table) ? 'bg-primary-container/20 text-primary' : 'bg-secondary-container/30 text-secondary') : 'bg-stone-100 text-stone-400'">
                                 <span class="material-symbols-outlined">table_restaurant</span>
                             </div>
                             <h4 class="font-bold text-on-surface" x-text="table.nomor_meja"></h4>
                             <p class="text-xs text-stone-500" x-text="table.kapasitas + ' orang'"></p>
                             <span class="inline-block mt-2 px-2 py-0.5 text-[10px] font-bold rounded-full"
-                                  :class="isTableActive(table) ? (isTableUsed(table) ? 'bg-primary-container text-on-primary-container' : 'bg-secondary-container text-on-secondary-container') : 'bg-stone-100 text-stone-400'"
-                                  x-text="isTableActive(table) ? (isTableUsed(table) ? 'Terisi' : 'Tersedia') : 'Nonaktif'"></span>
+                                :class="isTableActive(table) ? (isTableUsed(table) ? 'bg-primary-container text-on-primary-container' : 'bg-secondary-container text-on-secondary-container') : 'bg-stone-100 text-stone-400'"
+                                x-text="isTableActive(table) ? (isTableUsed(table) ? 'Terisi' : 'Tersedia') : 'Nonaktif'"></span>
                         </div>
                     </template>
                 </div>

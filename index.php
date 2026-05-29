@@ -34,9 +34,19 @@ $router = new \App\Core\Router();
 
 // Define Routes
 $router->get('/', [\App\Controllers\HomeController::class, 'index']);
-$router->get('/menu', [\App\Controllers\MenuController::class, 'index']);
 $router->get('/scan-qr', [\App\Controllers\ScanqrController::class, 'index']);
+$router->post('/scan-qr', [\App\Controllers\ScanqrController::class, 'inputManualCode']);
+$router->get('/menu/logout', [\App\Controllers\ScanqrController::class, 'logoutTable']);
+$router->get('/menu', [\App\Controllers\MenuController::class, 'index'], [\App\Middleware\TableAccessMiddleware::class]);
+// Cart Routes
 $router->get('/cart', [\App\Controllers\CartController::class, 'index']);
+$router->post('/cart/add', [\App\Controllers\CartController::class, 'addItem']);
+$router->post('/cart/update', [\App\Controllers\CartController::class, 'updateItem']);
+$router->post('/cart/remove', [\App\Controllers\CartController::class, 'removeItem']);
+$router->get('/cart/api', [\App\Controllers\CartController::class, 'getCartApi']);
+
+// Like Routes
+$router->post('/like/toggle', [\App\Controllers\MenuLikeController::class, 'toggle']);
 $router->get('/order-tracking', [\App\Controllers\OrderController::class, 'index']);
 
 // Dashboard protected with AuthMiddleware
@@ -56,6 +66,7 @@ $router->post('/dashboard/table-management/delete-area', [\App\Controllers\Table
 $router->post('/dashboard/table-management/create-table', [\App\Controllers\TablemanagementController::class, 'createTable'], [\App\Middleware\SuperAdminMiddleware::class]);
 $router->get('/dashboard/table-management/get-tables', [\App\Controllers\TablemanagementController::class, 'getTablesByArea'], [\App\Middleware\SuperAdminMiddleware::class]);
 $router->post('/dashboard/table-management/delete-table', [\App\Controllers\TablemanagementController::class, 'deleteTable'], [\App\Middleware\SuperAdminMiddleware::class]);
+$router->get('/dashboard/table-management/export-qr', [\App\Controllers\TablemanagementController::class, 'exportQr'], [\App\Middleware\SuperAdminMiddleware::class]);
 $router->get('/dashboard/settings', [\App\Controllers\SettingController::class, 'index'], [\App\Middleware\SuperAdminMiddleware::class]);
 $router->post('/dashboard/settings/create-payment-method', [\App\Controllers\SettingController::class, 'createPayment'], [\App\Middleware\SuperAdminMiddleware::class]);
 $router->post('/dashboard/settings/delete-payment-method', [\App\Controllers\SettingController::class, 'deletePayment'], [\App\Middleware\SuperAdminMiddleware::class]);

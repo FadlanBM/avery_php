@@ -19,30 +19,18 @@
           </p>
         </div>
 
-        <div class="action-group">
+        <form class="action-group" action="<?= BASE_URL ?>/scan-qr" method="POST">
           <div class="relative flex w-full max-w-[320px] flex-1">
-            <input class="w-full rounded-xl border-0 bg-[#ede7e0] px-6 py-4 pr-24 text-lg transition focus:outline-none focus:ring-2 focus:ring-[#9c3800]" placeholder="Masukkan Kode Meja" type="text" />
-            <button class="absolute inset-y-2 right-2 rounded-lg bg-[#1d1b17] px-6 text-sm font-bold text-[#fef8f1] transition hover:bg-[#9c3800]">GO</button>
+            <input name="code_data" value="<?= htmlspecialchars($codeData ?? '') ?>" class="w-full rounded-xl border-0 bg-[#ede7e0] px-6 py-4 pr-24 text-lg transition focus:outline-none focus:ring-2 focus:ring-[#9c3800]" placeholder="Masukkan Kode Meja" type="text" required />
+            <button type="submit" class="absolute inset-y-2 right-2 rounded-lg bg-[#1d1b17] px-6 text-sm font-bold text-[#fef8f1] transition hover:bg-[#9c3800]">GO</button>
           </div>
-          <button class="btn btn-text">
-            Panduan Bantuan
-          </button>
-        </div>
+        </form>
 
-        <div class="social-proof">
-          <div class="avatar-group">
-            <div class="avatar">
-              <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZDruqwhej1pad7gUOr-M_kNkJ-by1B6SVbzhRgwOGGYCXa9huNJY3yDkMc7H1hC7j8UzAuBR454vWkJ6ARitwks806qE4BL1yhghm6hgTUzgIInshDi1a57q0wZsRTdUKUgE6wjNoJbuQYJyg3dDHLqQ-qYBTzdt9tzl0acfG8JeVT4xAZxeg7kiIYAjIm3WAOve9luoPqOt6bbMWsGivFmvmApqFZjGR0TRCtkqj8DHXmynsYFzPgnrAUlV6XRxYIcLem1qB4XoA" alt="Patron" />
-            </div>
-            <div class="avatar">
-              <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0vqSyePb3gFWY7H1u2nM8ncnHgQT6FO2bhHkg8joCqNFMw4lcbPxXSiUX52ERwwjpvMAEu9xvgupfVJgzqxI7Fihj8iNQMd8yw7PCGWcluZQJ_53SR__x9D5UfiFuGA_GX7cbpUS9Wbpce1HH62jxC7ft1I_f-7vAjMw_-gC-yT4XquM_TpXtw6FFLcke89OkXPElp6102eFbgvxMht3YmtW6SNMtDid_v70IrP2rHETAhQ1Nfg26HCwV63xzQf4FSTRyC6N08VNT" alt="Patron" />
-            </div>
-            <div class="avatar avatar-plus">+1k</div>
+        <?php if (!empty($error)): ?>
+          <div class="mt-4 max-w-[420px] rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+            <?= htmlspecialchars($error) ?>
           </div>
-          <p class="proof-text">
-            Bergabung dengan ribuan tamu yang menikmati kemudahan menu digital.
-          </p>
-        </div>
+        <?php endif; ?>
       </section>
 
       <section class="scanner-viewport">
