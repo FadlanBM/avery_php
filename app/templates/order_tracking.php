@@ -19,7 +19,7 @@ $tableNumber = $order['nomor_meja'] ?? 'T12';
         <a href="<?= BASE_URL ?>/menu" class="brand-logo">Saffron & Sage</a>
         <nav class="nav-links">
           <a class="nav-item" href="<?= BASE_URL ?>/menu">Menu</a>
-          <a class="nav-item active" href="<?= BASE_URL ?>/order-tracking">Riwayat</a>
+          <a class="nav-item" href="<?= BASE_URL ?>/history">Riwayat</a>
           <a class="nav-item" href="#">Bantuan</a>
         </nav>
         <div class="nav-actions">
@@ -97,6 +97,48 @@ $tableNumber = $order['nomor_meja'] ?? 'T12';
         </span>
       </div>
     </div>
+
+    <!-- Payment QR Code for Cash payments -->
+    <?php if (!empty($order['payment_code'])): ?>
+      <div class="payment-qr-section">
+        <div class="payment-qr-badge">
+          <span class="dot-indicator"></span>
+          <span class="badge-text">Menunggu Pembayaran</span>
+        </div>
+        <h2 class="section-label">Kode Pembayaran Tunai</h2>
+        <p class="qr-desc">Tunjukkan QR Code atau Kode Referensi ini ke kasir untuk menyelesaikan transaksi.</p>
+        
+        <!-- Static QR Container for Maximum Compatibility -->
+        <div class="payment-qr-card" id="payment-qr-card">
+          <div class="payment-qr-card-inner">
+            <img
+              src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=<?= urlencode($order['payment_code']) ?>"
+              alt="QR Code Pembayaran"
+              class="qr-image"
+              width="250"
+              height="250"
+            >
+            <div class="qr-icons-hint">
+              <span class="material-symbols-outlined text-2xl">account_balance_wallet</span>
+              <span class="material-symbols-outlined text-2xl">qr_code_scanner</span>
+              <span class="material-symbols-outlined text-2xl">contactless</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Two Column Details Grid -->
+        <div class="qr-details-grid">
+          <div>
+            <span class="qr-detail-label">Kode Referensi</span>
+            <span class="qr-detail-value ref-code"><?= htmlspecialchars($order['payment_code']) ?></span>
+          </div>
+          <div class="detail-col-right">
+            <span class="qr-detail-label">Total Tagihan</span>
+            <span class="qr-detail-value">Rp <?= number_format($order['total_amount'], 0, ',', '.') ?></span>
+          </div>
+        </div>
+      </div>
+    <?php endif; ?>
 
     <!-- Timeline -->
     <?php if ($status !== 'cancelled'): ?>
@@ -236,6 +278,7 @@ $tableNumber = $order['nomor_meja'] ?? 'T12';
 
       // Poll status every 5 seconds
       setInterval(checkOrderStatus, 5000);
+
     </script>
   <?php endif; ?>
 </body>

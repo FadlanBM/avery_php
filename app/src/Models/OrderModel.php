@@ -45,4 +45,21 @@ class OrderModel extends Model
         $stmt->execute(['order_id' => $orderId]);
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
+
+    /**
+     * Get detailed order with table and payment method by payment_code
+     */
+    public function getOrderWithDetails_byCode(string $code)
+    {
+        $stmt = $this->db->prepare(
+            "SELECT o.*, rt.nomor_meja, pm.name as payment_method_name
+             FROM {$this->table} o
+             LEFT JOIN restaurant_table rt ON o.restaurant_table_id = rt.id
+             LEFT JOIN payment_method pm ON o.payment_method_id = pm.id
+             WHERE o.payment_code = :code
+             LIMIT 1"
+        );
+        $stmt->execute(['code' => $code]);
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
+    }
 }

@@ -15,8 +15,8 @@
                 <span>Saffron & Sage</span>
             </div>
             <nav class="main-nav">
-                <a href="#" class="active">Menu</a>
-                <a href="#">Riwayat</a>
+                <a href="<?= BASE_URL ?>/menu" class="active">Menu</a>
+                <a href="<?= BASE_URL ?>/history">Riwayat</a>
                 <a href="#">Bantuan</a>
             </nav>
             <div class="header-actions">

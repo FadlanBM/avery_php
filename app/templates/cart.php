@@ -23,7 +23,7 @@ $tableNumber = $_SESSION['table_number'] ?? null;
         <div class="brand-logo">Saffron & Sage</div>
         <nav class="nav-links">
           <a class="nav-item" href="<?= BASE_URL ?>/menu">Menu</a>
-          <a class="nav-item" href="#">Riwayat</a>
+          <a class="nav-item" href="<?= BASE_URL ?>/history">Riwayat</a>
           <a class="nav-item" href="#">Bantuan</a>
         </nav>
         <div class="nav-actions">

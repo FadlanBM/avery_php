@@ -103,8 +103,21 @@ class CheckoutController extends Controller
         
         $tableId = $_SESSION['table_id'] ?? null;
         
-        // 4. Create Order
+        // Fetch payment method name to check if cash
+        $paymentMethodModel = new PaymentMethod();
+        $paymentMethod = $paymentMethodModel->find($paymentMethodId);
+        $paymentMethodName = $paymentMethod->name ?? '';
+
+        $paymentCode = null;
         $orderModel = new OrderModel();
+        if (\App\Helpers\PaymentCodeHelper::isCash($paymentMethodName)) {
+            do {
+                $paymentCode = \App\Helpers\PaymentCodeHelper::generate();
+                $existing = $orderModel->firstWhere('payment_code', $paymentCode);
+            } while ($existing !== null);
+        }
+
+        // 4. Create Order
         $order = $orderModel->create([
             'cart_id' => $cart->id,
             'session_id' => $sessionId,
@@ -115,7 +128,8 @@ class CheckoutController extends Controller
             'subtotal' => $subtotal,
             'tax_amount' => $tax,
             'service_charge' => $serviceCharge,
-            'total_amount' => $total
+            'total_amount' => $total,
+            'payment_code' => $paymentCode
         ]);
         
         if (!$order) {

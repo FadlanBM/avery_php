@@ -16,7 +16,7 @@ $tableNumber = $tableNumber ?? $_SESSION['table_number'] ?? null;
         <a href="<?= BASE_URL ?>/menu" class="brand-logo">Saffron & Sage</a>
         <nav class="nav-links">
           <a class="nav-link" href="<?= BASE_URL ?>/menu">Menu</a>
-          <a class="nav-link" href="<?= BASE_URL ?>/order-tracking">Riwayat</a>
+          <a class="nav-link" href="<?= BASE_URL ?>/history">Riwayat</a>
           <a class="nav-link" href="#">Bantuan</a>
         </nav>
         <div class="nav-actions">

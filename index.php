@@ -53,6 +53,9 @@ $router->get('/order-tracking', [\App\Controllers\OrderController::class, 'index
 $router->get('/checkout', [\App\Controllers\CheckoutController::class, 'index'], [\App\Middleware\TableAccessMiddleware::class]);
 $router->post('/checkout/process', [\App\Controllers\CheckoutController::class, 'process'], [\App\Middleware\TableAccessMiddleware::class]);
 $router->get('/order/status', [\App\Controllers\OrderController::class, 'getStatus']);
+$router->get('/order/lookup', [\App\Controllers\OrderController::class, 'lookupByCode']);
+$router->get('/history', [\App\Controllers\HistoryController::class, 'index'], [\App\Middleware\TableAccessMiddleware::class]);
+$router->post('/order/cancel', [\App\Controllers\OrderController::class, 'cancel'], [\App\Middleware\TableAccessMiddleware::class]);
 
 // Dashboard protected with AuthMiddleware
 $router->get('/dashboard', [\App\Controllers\DashboardController::class, 'index'], [\App\Middleware\SuperAdminMiddleware::class]);
