@@ -1,376 +1,284 @@
-# ISSUE: Tambah Kolom `payment_code` pada Tabel `order` untuk Pembayaran Tunai via QR
+# ISSUE: Halaman Riwayat Transaksi Berdasarkan Session Pelanggan
 
 ## Ringkasan
 
-Ketika pelanggan memilih metode pembayaran **tunai (cash)**, sistem harus otomatis menghasilkan **kode unik** yang dikonversi menjadi **QR Code**. QR code ini kemudian ditunjukkan oleh pelanggan ke kasir sebagai bukti dan referensi pesanan, sehingga kasir bisa langsung scan dan memproses pembayaran tanpa perlu input manual nomor pesanan.
+Setiap pelanggan yang scan QR meja akan memiliki **session unik** (`cart_session_id`) yang tersimpan di browser mereka. Fitur ini menambahkan halaman `/history` yang menampilkan **semua pesanan yang dibuat oleh session tersebut** — lengkap dengan status, total harga, daftar menu yang dipesan, dan tanggal transaksi. Dengan fitur ini, pelanggan bisa memantau riwayat semua pesanannya selama satu sesi kunjungan ke restoran.
 
 ---
 
 ## Latar Belakang Masalah
 
-Saat ini tabel `order` belum memiliki kolom untuk menyimpan kode unik pembayaran. Alur pembayaran tunai masih manual — kasir harus mencari pesanan berdasarkan nomor meja atau ID pesanan, yang rawan human error.
+Saat ini, halaman `/order-tracking` hanya menampilkan **satu pesanan aktif** berdasarkan `order_id` yang dikirim via URL query string (`?order_id=X`). Tidak ada halaman yang memungkinkan pelanggan melihat **semua transaksi** yang sudah mereka buat dalam satu sesi kunjungan.
 
-Dengan adanya `payment_code`, alur menjadi:
-```
-Pelanggan checkout (pilih tunai) → Sistem generate kode unik → QR ditampilkan di halaman order-tracking → Kasir scan QR → Langsung ketemu pesanan yang tepat
-```
+Contoh skenario: pelanggan memesan minuman dahulu, lalu beberapa menit kemudian memesan makanan. Keduanya tercatat sebagai order terpisah, dan saat ini tidak ada halaman yang menampilkan keduanya sekaligus.
 
 ---
 
-## Tujuan
+## Tujuan Fitur
 
-1. Tambah kolom `payment_code` di tabel `order` (migrasi ALTER TABLE)
-2. Generate kode unik otomatis saat checkout dengan metode tunai
-3. Tampilkan QR code dari `payment_code` di halaman **order-tracking** pelanggan
-4. Sediakan endpoint kasir untuk lookup pesanan berdasarkan `payment_code`
+1. Buat halaman `/history` yang menampilkan daftar semua order milik `$_SESSION['cart_session_id']`
+2. Setiap order menampilkan: nomor pesanan, status, metode pembayaran, total, dan item yang dipesan
+3. Navigasi dari navbar dan tombol di halaman `order-tracking` menuju halaman riwayat
+4. Tampilan yang responsif dan konsisten dengan design system yang sudah ada
 
 ---
 
 ## Spesifikasi Teknis
 
-### 1. Struktur Kolom Baru
+### 1. Data yang Ditampilkan per Order
 
-| Kolom | Tipe | Keterangan |
-|-------|------|------------|
-| `payment_code` | `VARCHAR(32)` | Kode unik alphanumerik, NULL jika bukan tunai, UNIQUE |
+| Field | Sumber | Keterangan |
+|-------|--------|------------|
+| Nomor Pesanan | `order.id` | Format `ORD-000001` |
+| Waktu Pesan | `order.created_at` | Format tanggal + jam |
+| Nomor Meja | `restaurant_table.nomor_meja` | JOIN dengan `restaurant_table` |
+| Metode Bayar | `payment_method.name` | JOIN dengan `payment_method` |
+| Status | `order.status` | Badge berwarna sesuai status |
+| Total Tagihan | `order.total_amount` | Format Rupiah |
+| Daftar Item | `order_item` JOIN `restaurant_menu` | Nama menu + qty + harga satuan |
+| Kode Bayar | `order.payment_code` | Tampil jika tidak NULL (tunai) |
 
-**Format kode:** `PAY-{YYYYMMDD}-{8 karakter acak}` → contoh: `PAY-20260530-A3F9K2X1`
+### 2. Status Badge & Warna
 
-**Aturan:**
-- Hanya diisi jika `payment_method` adalah tunai/cash
-- `NULL` untuk metode transfer, QRIS, atau non-cash lainnya
-- Kolom `UNIQUE` agar tidak ada duplikat
-- Tidak bisa diubah setelah dibuat
-
----
-
-### 2. File yang Perlu Dibuat / Dimodifikasi
-
-#### A. Migrasi Baru `[BUAT BARU]`
-**File:** `app/database/migrations/2026_05_30_000004_AddPaymentCodeToOrder.php`
-
-```php
-<?php
-use App\Core\Database;
-
-class AddPaymentCodeToOrder
-{
-    public function up()
-    {
-        $db = Database::getInstance()->getConnection();
-        $driver = $db->getAttribute(\PDO::ATTR_DRIVER_NAME);
-        $tableName = $driver === 'pgsql' ? '"order"' : '`order`';
-
-        // ALTER TABLE untuk menambah kolom payment_code
-        $db->exec("ALTER TABLE {$tableName}
-            ADD COLUMN IF NOT EXISTS payment_code VARCHAR(32) UNIQUE DEFAULT NULL
-        ");
-
-        echo "Kolom payment_code berhasil ditambahkan ke tabel order.\n";
-    }
-
-    public function down()
-    {
-        $db = Database::getInstance()->getConnection();
-        $driver = $db->getAttribute(\PDO::ATTR_DRIVER_NAME);
-        $tableName = $driver === 'pgsql' ? '"order"' : '`order`';
-
-        $db->exec("ALTER TABLE {$tableName} DROP COLUMN IF EXISTS payment_code");
-        echo "Kolom payment_code berhasil dihapus.\n";
-    }
-}
-```
-
-**Cara jalankan:**
-```bash
-docker exec devilbox-php-1 php /shared/httpd/avery_php/htdocs/bin/migrate.php
-```
+| Status | Label | Warna |
+|--------|-------|-------|
+| `pending` | Menunggu Konfirmasi | Kuning / Warning |
+| `confirmed` | Dikonfirmasi | Biru / Info |
+| `preparing` | Sedang Dimasak | Orange |
+| `ready` | Siap Disajikan | Hijau muda |
+| `completed` | Selesai | Hijau |
+| `cancelled` | Dibatalkan | Merah |
 
 ---
 
-#### B. Helper untuk Generate Kode `[BUAT BARU]`
-**File:** `app/src/Helpers/PaymentCodeHelper.php`
+## File yang Perlu Dibuat / Dimodifikasi
+
+### A. Controller Baru `[BUAT BARU]`
+**File:** `app/src/Controllers/HistoryController.php`
+
+Controller ini menerima GET request ke `/history`, memastikan session ID ada, mengambil semua order milik session tersebut beserta item-itemnya, lalu merender template.
 
 ```php
 <?php
-namespace App\Helpers;
 
-class PaymentCodeHelper
+namespace App\Controllers;
+
+use App\Core\Controller;
+use App\Models\OrderModel;
+use App\Models\OrderItemModel;
+
+class HistoryController extends Controller
 {
-    /**
-     * Generate kode unik pembayaran tunai
-     * Format: PAY-YYYYMMDD-XXXXXXXX (8 karakter acak huruf besar + angka)
-     */
-    public static function generate(): string
+    public function index()
     {
-        $date = date('Ymd');
-        $random = strtoupper(substr(bin2hex(random_bytes(4)), 0, 8));
-        return "PAY-{$date}-{$random}";
-    }
+        // 1. Ambil session ID (dibuat di CartController/CheckoutController)
+        $sessionId = $_SESSION['cart_session_id'] ?? null;
 
-    /**
-     * Cek apakah nama payment method termasuk tunai/cash
-     */
-    public static function isCash(string $paymentMethodName): bool
-    {
-        $cashKeywords = ['tunai', 'cash'];
-        $lowerName = strtolower($paymentMethodName);
-        foreach ($cashKeywords as $keyword) {
-            if (str_contains($lowerName, $keyword)) {
-                return true;
-            }
+        if (!$sessionId) {
+            // Tidak ada session, redirect ke menu
+            header('Location: ' . BASE_URL . '/menu');
+            return;
         }
-        return false;
+
+        // 2. Ambil semua order milik session ini (urut dari terbaru)
+        $orderModel = new OrderModel();
+        $orders = $orderModel->getOrdersBySession($sessionId);
+
+        // 3. Untuk setiap order, ambil juga item-itemnya
+        $orderItemModel = new OrderItemModel();
+        $ordersWithItems = [];
+        foreach ($orders as $order) {
+            $items = $orderItemModel->getItemsWithMenuDetails($order['id']);
+            $ordersWithItems[] = [
+                'order' => $order,
+                'items' => $items,
+            ];
+        }
+
+        // 4. Render template
+        return $this->view('history', [
+            'title'          => 'Riwayat Pesanan',
+            'ordersWithItems' => $ordersWithItems,
+            'sessionId'      => $sessionId,
+        ]);
     }
 }
 ```
 
----
-
-#### C. Modifikasi `CheckoutController.php` `[MODIFIKASI]`
-**File:** `app/src/Controllers/CheckoutController.php`
-
-Di method `process()`, tambahkan logika generate `payment_code`:
-
-```php
-// Di dalam method process(), setelah validasi payment_method_id:
-
-// Ambil nama payment method untuk cek apakah tunai
-$paymentMethod = $paymentMethodModel->find($paymentMethodId);
-$paymentMethodName = $paymentMethod->name ?? '';
-
-// Generate payment_code hanya untuk pembayaran tunai
-$paymentCode = null;
-if (\App\Helpers\PaymentCodeHelper::isCash($paymentMethodName)) {
-    // Generate dengan retry jika kode sudah ada (sangat jarang terjadi)
-    do {
-        $paymentCode = \App\Helpers\PaymentCodeHelper::generate();
-        $existing = $orderModel->firstWhere('payment_code', $paymentCode);
-    } while ($existing !== null);
-}
-
-// Sertakan payment_code saat membuat order:
-$orderId = $orderModel->create([
-    'cart_id'              => $cart['id'],
-    'session_id'           => $sessionId,
-    'restaurant_table_id'  => $_SESSION['table_id'] ?? null,
-    'payment_method_id'    => $paymentMethodId,
-    'status'               => 'pending',
-    'notes'                => $notes,
-    'subtotal'             => $subtotal,
-    'tax_amount'           => $tax,
-    'service_charge'       => $serviceCharge,
-    'total_amount'         => $total,
-    'payment_code'         => $paymentCode,  // NULL jika bukan tunai
-]);
-```
+**Penjelasan:**
+- Method `getOrdersBySession()` sudah ada di `OrderModel.php` — tinggal dipakai
+- Method `getItemsWithMenuDetails()` sudah ada di `OrderItemModel.php` — tinggal dipakai
+- Tidak ada logika baru yang kompleks, hanya merakit data dari model yang ada
 
 ---
 
-#### D. Modifikasi `order_tracking.php` `[MODIFIKASI]`
-**File:** `app/templates/order_tracking.php`
+### B. Template Halaman `[BUAT BARU]`
+**File:** `app/templates/history.php`
 
-Tambahkan section QR code di bawah order info card, **hanya tampil jika `payment_code` ada**:
+Struktur template:
+1. **Navbar** — sama dengan halaman lain (`order-tracking`, `cart`)
+2. **Header Halaman** — judul "Riwayat Pesanan Saya" + info meja
+3. **Jika tidak ada order** — tampilkan pesan kosong dengan tombol kembali ke menu
+4. **Daftar Order Card** — untuk setiap order, tampilkan:
+   - Header card: nomor pesanan, waktu, status badge
+   - Info meja + metode pembayaran
+   - Daftar item yang dipesan (nama, qty, harga satuan)
+   - Footer card: subtotal, pajak, service charge, **total tagihan**
+   - Tombol "Lihat Detail" → menuju `/order-tracking?order_id=X`
+   - Jika `payment_code` ada: tampilkan tombol/link "Tampilkan QR Bayar" → menuju `/order-tracking?order_id=X` (karena QR ada di halaman tracking)
 
-```php
-<?php if (!empty($order['payment_code'])): ?>
-  <div class="payment-qr-section">
-    <h2 class="section-label">Kode Pembayaran Tunai</h2>
-    <p class="qr-desc">Tunjukkan QR Code ini ke kasir untuk melakukan pembayaran</p>
+Gambaran struktur HTML:
+```html
+<main class="history-container">
+  <header class="history-header">
+    <h1>Riwayat Pesanan</h1>
+    <p>Semua pesanan Anda selama kunjungan ini</p>
+  </header>
 
-    <!-- QR Code dari Google Charts API atau library PHP -->
-    <div class="qr-wrapper">
-      <img
-        src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=<?= urlencode($order['payment_code']) ?>"
-        alt="QR Code Pembayaran"
-        class="qr-image"
-        width="200"
-        height="200"
-      >
+  <?php if (empty($ordersWithItems)): ?>
+    <!-- Tampilan kosong -->
+    <div class="empty-state">
+      <span class="material-symbols-outlined">receipt_long</span>
+      <p>Belum ada pesanan dalam sesi ini</p>
+      <a href="<?= BASE_URL ?>/menu" class="btn-primary">Lihat Menu</a>
     </div>
 
-    <div class="payment-code-display">
-      <span class="code-label">KODE REFERENSI</span>
-      <span class="code-value"><?= htmlspecialchars($order['payment_code']) ?></span>
-    </div>
-  </div>
-<?php endif; ?>
+  <?php else: ?>
+    <?php foreach ($ordersWithItems as $entry): ?>
+      <?php $order = $entry['order']; $items = $entry['items']; ?>
+      <div class="order-card">
+
+        <!-- Header Card -->
+        <div class="order-card-header">
+          <div>
+            <span class="order-number">ORD-<?= str_pad($order['id'], 6, '0', STR_PAD_LEFT) ?></span>
+            <span class="order-date"><?= date('d M Y, H:i', strtotime($order['created_at'])) ?></span>
+          </div>
+          <span class="status-badge status-<?= $order['status'] ?>">
+            <!-- Label status (lihat tabel status di atas) -->
+          </span>
+        </div>
+
+        <!-- Info Meja & Pembayaran -->
+        <div class="order-meta">
+          <span>Meja <?= $order['nomor_meja'] ?></span>
+          <span><?= $order['payment_method_name'] ?></span>
+        </div>
+
+        <!-- Daftar Item -->
+        <ul class="item-list">
+          <?php foreach ($items as $item): ?>
+            <li class="item-row">
+              <span class="item-name"><?= $item['name'] ?></span>
+              <span class="item-qty">x<?= $item['quantity'] ?></span>
+              <span class="item-price">Rp <?= number_format($item['unit_price'], 0, ',', '.') ?></span>
+            </li>
+          <?php endforeach; ?>
+        </ul>
+
+        <!-- Footer Card: Total -->
+        <div class="order-card-footer">
+          <div class="price-breakdown">
+            <div>Subtotal: Rp <?= number_format($order['subtotal'], 0, ',', '.') ?></div>
+            <div>Pajak 10%: Rp <?= number_format($order['tax_amount'], 0, ',', '.') ?></div>
+            <div>Service: Rp <?= number_format($order['service_charge'], 0, ',', '.') ?></div>
+            <div class="grand-total">Total: Rp <?= number_format($order['total_amount'], 0, ',', '.') ?></div>
+          </div>
+          <a href="<?= BASE_URL ?>/order-tracking?order_id=<?= $order['id'] ?>" class="btn-detail">
+            Lihat Detail & Tracking
+          </a>
+        </div>
+
+      </div>
+    <?php endforeach; ?>
+  <?php endif; ?>
+</main>
 ```
 
 ---
 
-#### E. Endpoint Kasir untuk Lookup by `payment_code` `[BUAT BARU]`
-**File:** `app/src/Controllers/OrderController.php`
+### C. CSS Baru `[BUAT BARU]`
+**File:** `assets/css/history.css`
 
-Tambahkan method `lookupByCode()`:
+Gaya yang dibutuhkan:
+- `.history-container` — max-width, padding, margin auto
+- `.history-header` — judul besar + deskripsi kecil
+- `.empty-state` — centered, icon besar, teks kosong, tombol CTA
+- `.order-card` — card dengan shadow, border-radius, margin-bottom
+- `.order-card-header` — flex row antara nomor pesanan dan badge status
+- `.status-badge` — pill label dengan warna berbeda per status
+  - `.status-pending` → kuning
+  - `.status-confirmed` → biru
+  - `.status-preparing` → orange
+  - `.status-ready` → hijau muda
+  - `.status-completed` → hijau gelap
+  - `.status-cancelled` → merah
+- `.order-meta` — flex row info meja + metode bayar, ukuran kecil
+- `.item-list` — list tanpa bullet, dengan gap
+- `.item-row` — flex row antara nama, qty, harga
+- `.order-card-footer` — flex antara breakdown harga dan tombol
+- `.grand-total` — teks besar, bold, warna primary
+- `.btn-detail` — tombol sekunder (outline/ghost style)
 
-```php
-/**
- * API: Kasir lookup order berdasarkan payment_code (hasil scan QR)
- * GET /order/lookup?code=PAY-20260530-A3F9K2X1
- */
-public function lookupByCode()
-{
-    header('Content-Type: application/json');
-
-    // TODO: Tambahkan middleware auth kasir di index.php
-
-    $code = $_GET['code'] ?? null;
-    if (!$code) {
-        echo json_encode(['success' => false, 'message' => 'Kode tidak ditemukan']);
-        return;
-    }
-
-    $orderModel = new OrderModel();
-    $order = $orderModel->getOrderWithDetails_byCode($code);
-
-    if (!$order) {
-        echo json_encode(['success' => false, 'message' => 'Pesanan tidak ditemukan untuk kode ini']);
-        return;
-    }
-
-    $orderItemModel = new OrderItemModel();
-    $items = $orderItemModel->getItemsWithMenuDetails($order['id']);
-
-    echo json_encode([
-        'success' => true,
-        'order'   => $order,
-        'items'   => $items,
-    ]);
-}
-```
-
-Tambahkan juga method `getOrderWithDetails_byCode()` di `OrderModel.php`:
-
-```php
-public function getOrderWithDetails_byCode(string $code)
-{
-    $stmt = $this->db->prepare(
-        "SELECT o.*, rt.nomor_meja, pm.name as payment_method_name
-         FROM {$this->table} o
-         LEFT JOIN restaurant_table rt ON o.restaurant_table_id = rt.id
-         LEFT JOIN payment_method pm ON o.payment_method_id = pm.id
-         WHERE o.payment_code = :code
-         LIMIT 1"
-    );
-    $stmt->execute(['code' => $code]);
-    return $stmt->fetch(\PDO::FETCH_ASSOC);
-}
-```
+Semua token warna dan radius menggunakan CSS custom properties yang sudah ada di `style.css` dan `cart.css` (contoh: `var(--primary)`, `var(--radius-2xl)`, `var(--surface-container-lowest)`).
 
 ---
 
-#### F. Tambah Route `[MODIFIKASI]`
+### D. Route Baru `[MODIFIKASI]`
 **File:** `index.php`
 
 ```php
-// Lookup pesanan berdasarkan payment_code (dipakai kasir saat scan QR)
-$router->get('/order/lookup', [\App\Controllers\OrderController::class, 'lookupByCode']);
+// History Routes
+$router->get('/history', [\App\Controllers\HistoryController::class, 'index']);
 ```
+
+Letakkan bersama route pelanggan lainnya (dekat `/cart`, `/checkout`, `/order-tracking`).
 
 ---
 
-### 3. CSS untuk Tampilan QR Code
+### E. Link Navigasi `[MODIFIKASI]`
+Tambahkan link "Riwayat" di navbar pada halaman-halaman pelanggan:
 
-Tambahkan di `assets/css/order_tracking.css`:
+**File:** `app/templates/order_tracking.php` (dan `cart.php`, `checkout.php`)
 
-```css
-/* QR Code Payment Section */
-.payment-qr-section {
-  background: var(--surface-container-lowest);
-  border-radius: var(--radius-2xl);
-  padding: 2rem;
-  margin-bottom: 2rem;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-  text-align: center;
-}
-
-.section-label {
-  font-size: 1.125rem;
-  font-weight: 800;
-  margin-bottom: 0.5rem;
-}
-
-.qr-desc {
-  font-size: 0.875rem;
-  color: var(--on-surface-variant);
-  margin-bottom: 1.5rem;
-}
-
-.qr-wrapper {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 1.5rem;
-}
-
-.qr-image {
-  border-radius: var(--radius-xl);
-  border: 4px solid var(--surface-container-high);
-}
-
-.payment-code-display {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  background: var(--surface-container-low);
-  padding: 1rem;
-  border-radius: var(--radius-lg);
-}
-
-.code-label {
-  font-size: 0.625rem;
-  font-weight: 800;
-  color: var(--outline);
-  letter-spacing: 0.1em;
-}
-
-.code-value {
-  font-size: 1.25rem;
-  font-weight: 800;
-  color: var(--primary);
-  font-family: 'Plus Jakarta Sans', monospace;
-  letter-spacing: 0.05em;
-}
-```
-
----
-
-## Alur Lengkap (Setelah Implementasi)
-
-```
-1. Pelanggan checkout → pilih "Tunai"
-2. CheckoutController::process() generate payment_code (PAY-20260530-A3F9K2X1)
-3. payment_code disimpan di tabel order
-4. Redirect ke /order-tracking
-5. Halaman order-tracking tampilkan QR code dari payment_code
-6. Pelanggan tunjukkan QR ke kasir
-7. Kasir scan QR → request GET /order/lookup?code=PAY-...
-8. Kasir lihat detail pesanan dan proses pembayaran
+```html
+<!-- Di dalam <nav class="nav-links"> -->
+<a class="nav-item" href="<?= BASE_URL ?>/history">Riwayat</a>
 ```
 
 ---
 
 ## Urutan Implementasi (Step-by-Step)
 
-- [ ] **Step 1** — Jalankan migrasi `AddPaymentCodeToOrder` (ALTER TABLE)
-- [ ] **Step 2** — Buat `PaymentCodeHelper.php`
-- [ ] **Step 3** — Update `CheckoutController::process()` untuk generate dan simpan `payment_code`
-- [ ] **Step 4** — Update `order_tracking.php` untuk tampilkan QR jika `payment_code` ada
-- [ ] **Step 5** — Update `order_tracking.css` tambahkan style QR section
-- [ ] **Step 6** — Tambah `getOrderWithDetails_byCode()` di `OrderModel.php`
-- [ ] **Step 7** — Tambah `lookupByCode()` di `OrderController.php`
-- [ ] **Step 8** — Daftarkan route `/order/lookup` di `index.php`
-- [ ] **Step 9** — Test end-to-end: checkout tunai → QR muncul → lookup berhasil
+- [ ] **Step 1** — Buat `HistoryController.php`
+- [ ] **Step 2** — Buat `history.php` template
+- [ ] **Step 3** — Buat `history.css` stylesheet
+- [ ] **Step 4** — Tambah route `/history` di `index.php`
+- [ ] **Step 5** — Tambah link navigasi "Riwayat" di navbar `order_tracking.php`, `cart.php`, dan `checkout.php`
+- [ ] **Step 6** — Uji coba: buat pesanan → cek `/history` → verifikasi semua order muncul
+
+---
+
+## Alur Lengkap (Setelah Implementasi)
+
+```
+1. Pelanggan scan QR → session dibuat otomatis
+2. Pelanggan memesan (bisa berkali-kali dalam satu sesi)
+3. Pelanggan klik "Riwayat" di navbar
+4. Sistem baca $_SESSION['cart_session_id'] → ambil semua order
+5. Halaman /history tampil: daftar semua order + item + total + status
+6. Pelanggan klik "Lihat Detail" → diarahkan ke /order-tracking?order_id=X
+```
 
 ---
 
 ## Catatan Penting
 
-> **QR Library:** Menggunakan [goqr.me API](https://api.qrserver.com) yang gratis, tidak perlu install library PHP. Format URL: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=KODE`
+> **Tidak butuh login:** Identitas pelanggan dikenali dari `$_SESSION['cart_session_id']` yang sudah ada di sistem. Tidak ada perubahan pada sistem autentikasi.
 
-> **Keamanan:** Endpoint `/order/lookup` sebaiknya dilindungi middleware autentikasi kasir agar tidak bisa diakses sembarangan orang.
+> **Model sudah siap:** `OrderModel::getOrdersBySession()` dan `OrderItemModel::getItemsWithMenuDetails()` sudah tersedia — tidak perlu menambah method baru di model manapun.
 
-> **Tabel sudah ada:** Tabel `order` sudah dibuat oleh migration sebelumnya (`2026_05_30_000003`). Migrasi baru ini hanya ALTER TABLE untuk menambah kolom, bukan membuat ulang.
+> **Keamanan:** Setiap request ke `/history` hanya menampilkan order yang session_id-nya sesuai dengan session browser pelanggan saat ini. Pelanggan tidak bisa melihat pesanan orang lain.
 
 ---
 
@@ -378,10 +286,10 @@ Tambahkan di `assets/css/order_tracking.css`:
 
 | File | Relevansi |
 |------|-----------|
-| `app/database/migrations/2026_05_30_000003_CreateOrderTables.php` | Migration asli tabel order |
-| `app/src/Controllers/CheckoutController.php` | Perlu dimodifikasi di method `process()` |
-| `app/src/Controllers/OrderController.php` | Perlu ditambah method `lookupByCode()` |
-| `app/src/Models/OrderModel.php` | Perlu ditambah method `getOrderWithDetails_byCode()` |
-| `app/templates/order_tracking.php` | Perlu ditambah section QR code |
-| `assets/css/order_tracking.css` | Perlu ditambah CSS untuk QR section |
-| `index.php` | Perlu ditambah route `/order/lookup` |
+| `app/src/Models/OrderModel.php` | `getOrdersBySession()` sudah ada |
+| `app/src/Models/OrderItemModel.php` | `getItemsWithMenuDetails()` sudah ada |
+| `app/templates/order_tracking.php` | Referensi desain navbar dan card |
+| `app/templates/cart.php` | Referensi desain navbar |
+| `assets/css/order_tracking.css` | Referensi token warna dan komponen |
+| `assets/css/cart.css` | Referensi card style |
+| `index.php` | Tempat mendaftarkan route baru |
