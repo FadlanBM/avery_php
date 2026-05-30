@@ -1,8 +1,129 @@
 <!DOCTYPE html>
 <html class="light" lang="id">
-<?php include 'partials/includes/head.php'; ?>`
+<?php
+include 'partials/includes/head.php';
+$roles = $roles ?? [];
+?>
 
-<body class="bg-background text-on-surface h-screen overflow-hidden" x-data="{ sidebarOpen: false, activeTab: 'restaurant-profile', showPaymentModal: false, showCategoryModal: false }">
+<body class="bg-background text-on-surface h-screen overflow-hidden" x-data="{ 
+    sidebarOpen: false, 
+    activeTab: 'restaurant-profile', 
+    showPaymentModal: false, 
+    showCategoryModal: false,
+    editPaymentMode: false,
+    paymentForm: { id: '', name: '', isActive: true },
+    async openEditPayment(id) {
+        try {
+            const response = await fetch('<?= BASE_URL ?>/dashboard/settings/get-payment?id=' + id);
+            const text = await response.text();
+            
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                console.error('Raw Response:', text);
+                Swal.fire('Error', 'Format data tidak valid.', 'error');
+                return;
+            }
+
+            if (data.success) {
+                this.paymentForm = {
+                    id: data.payment.id,
+                    name: data.payment.name,
+                    isActive: data.payment.is_active == 1
+                };
+                this.editPaymentMode = true;
+                this.showPaymentModal = true;
+            } else {
+                Swal.fire('Gagal', data.message || 'Gagal mengambil data', 'error');
+            }
+        } catch (e) {
+            console.error(e);
+            Swal.fire('Error', 'Terjadi kesalahan saat memuat data.', 'error');
+        }
+    },
+    resetPaymentForm() {
+        this.paymentForm = { id: '', name: '', isActive: true };
+        this.editPaymentMode = false;
+        this.showPaymentModal = true;
+    },
+    editCategoryMode: false,
+    categoryForm: { id: '', name: '', description: '' },
+    async openEditCategory(id) {
+        try {
+            const response = await fetch('<?= BASE_URL ?>/dashboard/settings/get-category?id=' + id);
+            const text = await response.text();
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                console.error('Raw Response:', text);
+                Swal.fire('Error', 'Format data tidak valid.', 'error');
+                return;
+            }
+
+            if (data.success) {
+                this.categoryForm = {
+                    id: data.category.id,
+                    name: data.category.name,
+                    description: data.category.description
+                };
+                this.editCategoryMode = true;
+                this.showCategoryModal = true;
+            } else {
+                Swal.fire('Gagal', data.message || 'Gagal mengambil data', 'error');
+            }
+        } catch (e) {
+            console.error(e);
+            Swal.fire('Error', 'Terjadi kesalahan saat memuat data.', 'error');
+        }
+    },
+    resetCategoryForm() {
+        this.categoryForm = { id: '', name: '', description: '' };
+        this.editCategoryMode = false;
+        this.showCategoryModal = true;
+    },
+    showEmployeeModal: false,
+    editEmployeeMode: false,
+    employeeForm: { id: '', name: '', username: '', password: '', role_id: '', isActive: true },
+    async openEditEmployee(id) {
+        try {
+            const response = await fetch('<?= BASE_URL ?>/dashboard/settings/get-employee?id=' + id);
+            const text = await response.text();
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                console.error('Raw Response:', text);
+                Swal.fire('Error', 'Format data tidak valid.', 'error');
+                return;
+            }
+
+            if (data.success) {
+                this.employeeForm = {
+                    id: data.employee.id,
+                    name: data.employee.name,
+                    username: data.employee.username,
+                    password: '', // Password stays empty on edit unless changed
+                    role_id: data.employee.role_id,
+                    isActive: data.employee.status == 1
+                };
+                this.editEmployeeMode = true;
+                this.showEmployeeModal = true;
+            } else {
+                Swal.fire('Gagal', data.message || 'Gagal mengambil data', 'error');
+            }
+        } catch (e) {
+            console.error(e);
+            Swal.fire('Error', 'Terjadi kesalahan saat memuat data.', 'error');
+        }
+    },
+    resetEmployeeForm() {
+        this.employeeForm = { id: '', name: '', username: '', password: '', role_id: '', isActive: true };
+        this.editEmployeeMode = false;
+        this.showEmployeeModal = true;
+    }
+}">
     <!-- Mobile Overlay -->
     <div x-show="sidebarOpen" x-transition.opacity @click="sidebarOpen = false" class="fixed inset-0 bg-black/50 z-30 lg:hidden"></div>
     <div class="flex">
@@ -66,111 +187,171 @@
                                     <h2 class="text-2xl font-bold tracking-tight">Profil Restoran</h2>
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                    <!-- Logo Upload Area -->
-                                    <div class="md:col-span-2 flex items-center gap-8 p-6 bg-surface-container-low rounded-2xl border-2 border-dashed border-outline-variant/30">
-                                        <div class="relative group">
-                                            <div class="w-32 h-32 rounded-2xl overflow-hidden bg-white flex items-center justify-center shadow-inner">
-                                                <img alt="Current Logo" class="w-full h-full object-cover" src="<?= BASE_URL ?>/assets/images/logo/logo_current.jpg" />
+                                    <form action="<?= BASE_URL ?>/dashboard/settings/update-profile" method="POST" enctype="multipart/form-data" class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8">
+                                        <!-- Logo Upload Area -->
+                                        <div class="md:col-span-2 flex items-center gap-8 p-6 bg-surface-container-low rounded-2xl border-2 border-dashed border-outline-variant/30">
+                                            <div class="relative group">
+                                                <div class="w-32 h-32 rounded-2xl overflow-hidden bg-white flex items-center justify-center shadow-inner">
+                                                    <img id="logo-preview" alt="Current Logo" class="w-full h-full object-cover" src="<?= (!empty($restaurant) && !empty($restaurant->logo_path)) ? BASE_URL . '/' . ltrim($restaurant->logo_path, '/') : BASE_URL . '/assets/images/logo/logo_current.jpg' ?>" />
+                                                </div>
+                                                <input type="file" id="logo-input" name="logo" class="hidden" accept="image/*" onchange="previewLogo(event)" />
+                                                <button type="button" onclick="document.getElementById('logo-input').click()" class="absolute -bottom-2 -right-2 w-10 h-10 bg-primary text-on-primary rounded-full flex items-center justify-center shadow-lg hover:scale-105 transition-transform">
+                                                    <span class="material-symbols-outlined text-xl">edit</span>
+                                                </button>
                                             </div>
-                                            <button class="absolute -bottom-2 -right-2 w-10 h-10 bg-primary text-on-primary rounded-full flex items-center justify-center shadow-lg hover:scale-105 transition-transform">
-                                                <span class="material-symbols-outlined text-xl">edit</span>
+                                            <div>
+                                                <h3 class="font-bold text-on-surface mb-1">Logo Restoran</h3>
+                                                <p class="text-sm text-on-surface-variant mb-4">Gunakan file PNG atau JPG minimal 512x512px untuk hasil terbaik.</p>
+                                                <button type="button" onclick="document.getElementById('logo-input').click()" class="px-5 py-2 bg-white text-primary border border-primary/20 rounded-full text-sm font-bold hover:bg-primary/5 transition-colors">Unggah Logo Baru</button>
+                                            </div>
+                                        </div>
+                                        <div class="space-y-2">
+                                            <label class="block text-sm font-bold text-on-surface-variant ml-1">Nama Restoran</label>
+                                            <input name="name" required class="w-full bg-surface-container-high border-none rounded-xl px-4 py-3 focus:ring-primary focus:bg-white transition-all text-on-surface shadow-sm" type="text" value="<?= htmlspecialchars($restaurant->name ?? 'Saffron & Sage Kitchen') ?>" />
+                                        </div>
+                                        <div class="space-y-2">
+                                            <label class="block text-sm font-bold text-on-surface-variant ml-1">Email Kontak</label>
+                                            <input name="email" required class="w-full bg-surface-container-high border-none rounded-xl px-4 py-3 focus:ring-primary focus:bg-white transition-all text-on-surface shadow-sm" type="email" value="<?= htmlspecialchars($restaurant->email ?? 'hello@saffronsage.id') ?>" />
+                                        </div>
+                                        <div class="md:col-span-2 space-y-2">
+                                            <label class="block text-sm font-bold text-on-surface-variant ml-1">Alamat Lengkap</label>
+                                            <textarea name="address" required class="w-full bg-surface-container-high border-none rounded-xl px-4 py-3 focus:ring-primary focus:bg-white transition-all text-on-surface shadow-sm" rows="3"><?= htmlspecialchars($restaurant->address ?? 'Jl. Senopati No. 88, Kebayoran Baru, Jakarta Selatan, 12190') ?></textarea>
+                                        </div>
+                                        <div class="space-y-2">
+                                            <label class="block text-sm font-bold text-on-surface-variant ml-1">Nomor Telepon</label>
+                                            <input name="phone_number" required class="w-full bg-surface-container-high border-none rounded-xl px-4 py-3 focus:ring-primary focus:bg-white transition-all text-on-surface shadow-sm" type="text" value="<?= htmlspecialchars($restaurant->phone_number ?? '+62 21 555 1234') ?>" />
+                                        </div>
+                                        <div class="md:col-start-2 flex gap-4 pt-4 justify-end">
+                                            <button type="button"
+                                                class="px-8 py-4 rounded-2xl font-bold text-on-surface-variant hover:bg-surface-container-high transition-colors">
+                                                Batal
+                                            </button>
+                                            <button type="submit"
+                                                class="px-10 py-4 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all active:scale-95">
+                                                Simpan Perubahan
                                             </button>
                                         </div>
-                                        <div>
-                                            <h3 class="font-bold text-on-surface mb-1">Logo Restoran</h3>
-                                            <p class="text-sm text-on-surface-variant mb-4">Gunakan file PNG atau JPG minimal 512x512px untuk hasil terbaik.</p>
-                                            <button class="px-5 py-2 bg-white text-primary border border-primary/20 rounded-full text-sm font-bold hover:bg-primary/5 transition-colors">Unggah Logo Baru</button>
-                                        </div>
-                                    </div>
-                                    <div class="space-y-2">
-                                        <label class="block text-sm font-bold text-on-surface-variant ml-1">Nama Restoran</label>
-                                        <input class="w-full bg-surface-container-high border-none rounded-xl px-4 py-3 focus:ring-primary focus:bg-white transition-all text-on-surface shadow-sm" type="text" value="<?= htmlspecialchars($restaurant->name ?? 'Saffron & Sage Kitchen') ?>" />
-                                    </div>
-                                    <div class="space-y-2">
-                                        <label class="block text-sm font-bold text-on-surface-variant ml-1">Email Kontak</label>
-                                        <input class="w-full bg-surface-container-high border-none rounded-xl px-4 py-3 focus:ring-primary focus:bg-white transition-all text-on-surface shadow-sm" type="email" value="<?= htmlspecialchars($restaurant->email ?? 'hello@saffronsage.id') ?>" />
-                                    </div>
-                                    <div class="md:col-span-2 space-y-2">
-                                        <label class="block text-sm font-bold text-on-surface-variant ml-1">Alamat Lengkap</label>
-                                        <textarea class="w-full bg-surface-container-high border-none rounded-xl px-4 py-3 focus:ring-primary focus:bg-white transition-all text-on-surface shadow-sm" rows="3"><?= htmlspecialchars($restaurant->address ?? 'Jl. Senopati No. 88, Kebayoran Baru, Jakarta Selatan, 12190') ?></textarea>
-                                    </div>
-                                    <div class="space-y-2">
-                                        <label class="block text-sm font-bold text-on-surface-variant ml-1">Nomor Telepon</label>
-                                        <input class="w-full bg-surface-container-high border-none rounded-xl px-4 py-3 focus:ring-primary focus:bg-white transition-all text-on-surface shadow-sm" type="text" value="<?= htmlspecialchars($restaurant->phone_number ?? '+62 21 555 1234') ?>" />
-                                    </div>
-                                    <div class="space-y-2">
-                                        <label class="block text-sm font-bold text-on-surface-variant ml-1">Kategori Utama</label>
-                                        <select class="w-full bg-surface-container-high border-none rounded-xl px-4 py-3 focus:ring-primary focus:bg-white transition-all text-on-surface shadow-sm">
-                                            <option>Modern Indonesian Cuisine</option>
-                                            <option>Fine Dining</option>
-                                            <option>Artisan Bakery</option>
-                                        </select>
-                                    </div>
+                                    </form>
+
+
                                 </div>
                             </section>
 
                             <!-- Jam Operasional Section -->
                             <section class="bg-surface-container-lowest rounded-[2rem] p-8 custom-shadow border border-orange-50/50">
-                                <div class="flex items-center justify-between mb-8">
-                                    <div class="flex items-center gap-4">
-                                        <div class="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
-                                            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">schedule</span>
-                                        </div>
-                                        <h2 class="text-2xl font-bold tracking-tight">Jam Operasional</h2>
-                                    </div>
-                                    <div class="flex items-center gap-2 px-4 py-2 bg-surface-container-low rounded-full">
-                                        <span class="text-xs font-bold text-on-surface-variant">Timezone: Asia/Jakarta</span>
-                                    </div>
-                                </div>
-                                <div class="space-y-4">
-                                    <?php
-                                    $defaultDays = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
-
-                                    // Map existing settings for easy lookup
-                                    $mappedSettings = [];
-                                    if (!empty($openSettings)) {
-                                        foreach ($openSettings as $setting) {
-                                            $mappedSettings[$setting->day] = $setting;
-                                        }
-                                    }
-
-                                    foreach ($defaultDays as $day):
-                                        $setting = $mappedSettings[$day] ?? null;
-                                        $isOpen = $setting ? ($setting->is_open === 'open' || $setting->is_open === '1') : ($day !== 'Minggu');
-                                        $startTime = $setting->start_time ?? ($day === 'Minggu' ? '00:00' : '10:00');
-                                        $endTime = $setting->end_time ?? ($day === 'Minggu' ? '00:00' : '22:00');
-                                    ?>
-                                        <div class="grid grid-cols-12 items-center gap-4 p-4 rounded-2xl hover:bg-surface-container-low transition-colors group <?= !$isOpen ? 'bg-surface-container-low' : '' ?>">
-                                            <div class="col-span-3 font-bold text-on-surface <?= !$isOpen ? 'opacity-60' : '' ?>"><?= $day ?></div>
-                                            <div class="col-span-6 flex items-center gap-3 <?= !$isOpen ? 'opacity-40' : '' ?>">
-                                                <input class="bg-surface-container-high border-none rounded-lg px-3 py-2 text-sm focus:ring-primary shadow-sm" type="time" value="<?= substr($startTime, 0, 5) ?>" <?= !$isOpen ? 'disabled' : '' ?> />
-                                                <span class="text-on-surface-variant">—</span>
-                                                <input class="bg-surface-container-high border-none rounded-lg px-3 py-2 text-sm focus:ring-primary shadow-sm" type="time" value="<?= substr($endTime, 0, 5) ?>" <?= !$isOpen ? 'disabled' : '' ?> />
+                                <form action="<?= BASE_URL ?>/dashboard/settings/update-open-setting" method="POST">
+                                    <div class="flex items-center justify-between mb-8">
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+                                                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">schedule</span>
                                             </div>
-                                            <div class="col-span-3 flex justify-end">
-                                                <label class="relative inline-flex items-center cursor-pointer">
-                                                    <input type="checkbox" class="sr-only peer" <?= $isOpen ? 'checked' : '' ?> />
-                                                    <div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
-                                                    <span class="ms-3 text-xs font-bold text-on-surface-variant"><?= $isOpen ? 'Buka' : 'Tutup' ?></span>
-                                                </label>
-                                            </div>
+                                            <h2 class="text-2xl font-bold tracking-tight">Jam Operasional</h2>
                                         </div>
-                                    <?php endforeach; ?>
-                                </div>
+                                        <div class="flex items-center gap-2 px-4 py-2 bg-surface-container-low rounded-full">
+                                            <span class="text-xs font-bold text-on-surface-variant">Timezone: Asia/Jakarta</span>
+                                        </div>
+                                    </div>
+                                    <div class="space-y-4">
+                                        <?php
+                                        $defaultDays = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+
+                                        // Map existing settings for easy lookup
+                                        $mappedSettings = $openSettings ?? [];
+
+                                        foreach ($defaultDays as $day):
+                                            $setting = $mappedSettings[$day] ?? null;
+                                            $isOpen = $setting ? ($setting->is_open === 'open' || $setting->is_open === '1') : ($day !== 'Minggu');
+                                            $startTime = $setting->start_time ?? ($day === 'Minggu' ? '00:00' : '10:00');
+                                            $endTime = $setting->end_time ?? ($day === 'Minggu' ? '00:00' : '22:00');
+                                        ?>
+                                            <div class="grid grid-cols-12 items-center gap-4 p-4 rounded-2xl hover:bg-surface-container-low transition-colors group <?= !$isOpen ? 'bg-surface-container-low' : '' ?>">
+                                                <div class="col-span-3 font-bold text-on-surface <?= !$isOpen ? 'opacity-60' : '' ?>"><?= $day ?></div>
+                                                <div class="col-span-6 flex items-center gap-3 <?= !$isOpen ? 'opacity-40' : '' ?>">
+                                                    <input name="days[<?= $day ?>][start_time]" class="bg-surface-container-high border-none rounded-lg px-3 py-2 text-sm focus:ring-primary shadow-sm" type="time" value="<?= substr($startTime, 0, 5) ?>" <?= !$isOpen ? 'disabled' : '' ?> />
+                                                    <span class="text-on-surface-variant">—</span>
+                                                    <input name="days[<?= $day ?>][end_time]" class="bg-surface-container-high border-none rounded-lg px-3 py-2 text-sm focus:ring-primary shadow-sm" type="time" value="<?= substr($endTime, 0, 5) ?>" <?= !$isOpen ? 'disabled' : '' ?> />
+                                                </div>
+                                                <div class="col-span-3 flex justify-end">
+                                                    <label class="relative inline-flex items-center cursor-pointer">
+                                                        <input type="checkbox" name="days[<?= $day ?>][is_open]" class="sr-only peer" <?= $isOpen ? 'checked' : '' ?> />
+                                                        <div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+                                                        <span class="ms-3 text-xs font-bold text-on-surface-variant"><?= $isOpen ? 'Buka' : 'Tutup' ?></span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                    <div class="flex justify-end mt-8">
+                                        <button type="submit" class="px-10 py-4 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all active:scale-95">
+                                            Simpan Jam Operasional
+                                        </button>
+                                    </div>
+                                </form>
                             </section>
                         </div>
 
                         <!-- Employee Settings Tab -->
                         <div x-show="activeTab === 'employees'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-12">
                             <section class="bg-surface-container-lowest rounded-[2rem] p-8 custom-shadow border border-orange-50/50">
-                                <div class="flex items-center gap-4 mb-8">
-                                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-                                        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">badge</span>
+                                <div class="flex items-center justify-between mb-8">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                                            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">badge</span>
+                                        </div>
+                                        <div>
+                                            <h2 class="text-2xl font-bold tracking-tight">Pengaturan Karyawan</h2>
+                                            <p class="text-sm text-on-surface-variant">Kelola akun dan akses karyawan Anda</p>
+                                        </div>
                                     </div>
-                                    <h2 class="text-2xl font-bold tracking-tight">Pengaturan Karyawan</h2>
+                                    <button @click="resetEmployeeForm()" class="flex items-center gap-2 px-5 py-2 bg-primary/10 text-primary rounded-full text-sm font-bold hover:bg-primary/20 transition-colors">
+                                        <span class="material-symbols-outlined text-sm">add</span> Tambah Baru
+                                    </button>
                                 </div>
-                                <div class="text-center py-12">
-                                    <p class="text-stone-500">Modul pengaturan karyawan sedang dalam pengembangan.</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <?php if (empty($employees)): ?>
+                                        <div class="md:col-span-2 text-center py-12 bg-surface-container-low rounded-2xl border-2 border-dashed border-outline-variant/30">
+                                            <div class="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center mx-auto mb-4">
+                                                <span class="material-symbols-outlined text-on-surface-variant text-3xl">badge</span>
+                                            </div>
+                                            <p class="text-on-surface-variant font-medium">Belum ada data karyawan.</p>
+                                            <p class="text-xs text-on-surface-variant mt-1">Klik tombol di atas untuk menambahkan.</p>
+                                        </div>
+                                    <?php else: ?>
+                                        <?php foreach ($employees as $employee): ?>
+                                            <div class="flex items-center justify-between p-5 bg-surface-container-low rounded-2xl border border-transparent hover:border-blue-200 transition-all group">
+                                                <div class="flex items-center gap-4">
+                                                    <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-sm text-blue-600">
+                                                        <span class="material-symbols-outlined">person</span>
+                                                    </div>
+                                                    <div>
+                                                        <p class="font-bold text-on-surface"><?= htmlspecialchars($employee->name) ?></p>
+                                                        <div class="flex items-center gap-2">
+                                                            <span class="px-2 py-0.5 rounded-md bg-surface-container-highest text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
+                                                                <?= htmlspecialchars($employee->role_name ?? 'No Role') ?>
+                                                            </span>
+                                                            <span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+                                                            <span class="text-[10px] font-bold <?= $employee->status ? 'text-secondary' : 'text-error' ?> uppercase tracking-wider">
+                                                                <?= $employee->status ? 'Aktif' : 'Non-aktif' ?>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="flex gap-1">
+                                                    <?php if ($employee->role_id !== 1): ?>
+                                                        <button @click="openEditEmployee(<?= $employee->id ?>)" class="p-2 text-on-surface-variant hover:text-primary hover:bg-primary/10 rounded-full transition-all opacity-0 group-hover:opacity-100" title="Edit">
+                                                            <span class="material-symbols-outlined">edit</span>
+                                                        </button>
+                                                        <form id="delete-employee-<?= $employee->id ?>" action="<?= BASE_URL ?>/dashboard/settings/delete-employee" method="POST" class="inline">
+                                                            <input type="hidden" name="id" value="<?= $employee->id ?>">
+                                                            <button type="button" onclick="confirmDelete('delete-employee-<?= $employee->id ?>', 'Akun karyawan <?= addslashes($employee->name) ?> akan dihapus permanen!')" class="p-2 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-full transition-all opacity-0 group-hover:opacity-100" title="Hapus">
+                                                                <span class="material-symbols-outlined">delete</span>
+                                                            </button>
+                                                        </form>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
                                 </div>
                             </section>
                         </div>
@@ -189,7 +370,7 @@
                                             <p class="text-sm text-on-surface-variant">Kelola cara pelanggan membayar pesanan</p>
                                         </div>
                                     </div>
-                                    <button @click="showPaymentModal = true" class="flex items-center gap-2 px-5 py-2 bg-primary/10 text-primary rounded-full text-sm font-bold hover:bg-primary/20 transition-colors">
+                                    <button @click="resetPaymentForm()" class="flex items-center gap-2 px-5 py-2 bg-primary/10 text-primary rounded-full text-sm font-bold hover:bg-primary/20 transition-colors">
                                         <span class="material-symbols-outlined text-sm">add</span> Tambah Baru
                                     </button>
                                 </div>
@@ -220,7 +401,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="flex gap-1">
-                                                    <button class="p-2 text-on-surface-variant hover:text-primary hover:bg-primary/10 rounded-full transition-all opacity-0 group-hover:opacity-100" title="Edit">
+                                                    <button @click="openEditPayment(<?= $method->id ?>)" class="p-2 text-on-surface-variant hover:text-primary hover:bg-primary/10 rounded-full transition-all opacity-0 group-hover:opacity-100" title="Edit">
                                                         <span class="material-symbols-outlined">edit</span>
                                                     </button>
                                                     <form id="delete-payment-<?= $method->id ?>" action="<?= BASE_URL ?>/dashboard/settings/delete-payment-method" method="POST" class="inline">
@@ -248,7 +429,7 @@
                                             <p class="text-sm text-on-surface-variant">Kelompokkan menu agar mudah ditemukan</p>
                                         </div>
                                     </div>
-                                    <button @click="showCategoryModal = true" class="flex items-center gap-2 px-5 py-2 bg-primary/10 text-primary rounded-full text-sm font-bold hover:bg-primary/20 transition-colors">
+                                    <button @click="resetCategoryForm()" class="flex items-center gap-2 px-5 py-2 bg-primary/10 text-primary rounded-full text-sm font-bold hover:bg-primary/20 transition-colors">
                                         <span class="material-symbols-outlined text-sm">add</span> Tambah Kategori
                                     </button>
                                 </div>
@@ -273,9 +454,17 @@
                                                         <p class="text-[10px] text-on-surface-variant"><?= htmlspecialchars($category->description) ?></p>
                                                     </div>
                                                 </div>
-                                                <button @click="showCategoryModal = true" class="p-2 text-on-surface-variant hover:text-primary hover:bg-primary/10 rounded-full transition-all opacity-0 group-hover:opacity-100" title="Edit">
-                                                    <span class="material-symbols-outlined">edit</span>
-                                                </button>
+                                                <div class="flex gap-1">
+                                                    <button @click="openEditCategory(<?= $category->id ?>)" class="p-2 text-on-surface-variant hover:text-primary hover:bg-primary/10 rounded-full transition-all opacity-0 group-hover:opacity-100" title="Edit">
+                                                        <span class="material-symbols-outlined">edit</span>
+                                                    </button>
+                                                    <form id="delete-category-<?= $category->id ?>" action="<?= BASE_URL ?>/dashboard/settings/delete-category-menu" method="POST" class="inline">
+                                                        <input type="hidden" name="id" value="<?= $category->id ?>">
+                                                        <button type="button" onclick="confirmDelete('delete-category-<?= $category->id ?>', 'Kategori <?= addslashes($category->name) ?> akan dihapus permanen!')" class="p-2 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-full transition-all opacity-0 group-hover:opacity-100" title="Hapus">
+                                                            <span class="material-symbols-outlined">delete</span>
+                                                        </button>
+                                                    </form>
+                                                </div>
                                             </div>
                                         <?php endforeach; ?>
                                     <?php endif; ?>
@@ -299,7 +488,7 @@
                         </div>
 
                         <!-- Final CTA Area -->
-                        <div class="flex items-center justify-between p-8 bg-surface-container-high/50 rounded-3xl backdrop-blur-sm border border-white/40">
+                        <!-- <div class="flex items-center justify-between p-8 bg-surface-container-high/50 rounded-3xl backdrop-blur-sm border border-white/40">
                             <div class="flex items-center gap-2 text-on-surface-variant">
                                 <span class="material-symbols-outlined text-secondary">info</span>
                                 <p class="text-sm">Perubahan akan langsung berdampak pada aplikasi pelanggan.</p>
@@ -308,7 +497,7 @@
                                 <button class="px-8 py-3 bg-white text-on-surface font-bold rounded-2xl hover:bg-stone-50 transition-all border border-stone-200">Batal</button>
                                 <button class="px-10 py-3 bg-primary text-on-primary font-bold rounded-2xl shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">Simpan Perubahan</button>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>
@@ -326,16 +515,17 @@
                             <div class="w-12 h-12 rounded-2xl bg-blue-100 flex items-center justify-center text-blue-600">
                                 <span class="material-symbols-outlined">payments</span>
                             </div>
-                            <h3 class="text-2xl font-bold">Metode Pembayaran</h3>
+                            <h3 class="text-2xl font-bold" x-text="editPaymentMode ? 'Edit Metode Pembayaran' : 'Metode Pembayaran'"></h3>
                         </div>
                         <button @click="showPaymentModal = false" class="w-10 h-10 rounded-full hover:bg-surface-container-high flex items-center justify-center transition-colors">
                             <span class="material-symbols-outlined">close</span>
                         </button>
                     </div>
-                    <form action="<?= BASE_URL ?>/dashboard/settings/create-payment-method" method="post" enctype="multipart/form-data" class="space-y-6">
+                    <form :action="editPaymentMode ? '<?= BASE_URL ?>/dashboard/settings/update-payment-method' : '<?= BASE_URL ?>/dashboard/settings/create-payment-method'" method="post" enctype="multipart/form-data" class="space-y-6">
+                        <input type="hidden" name="id" :value="paymentForm.id">
                         <div class="space-y-2">
                             <label class="block text-sm font-bold text-on-surface-variant ml-1">Nama Metode</label>
-                            <input name="name" type="text" placeholder="Contoh: Digital Wallet, Cash" class="w-full bg-surface-container-high border-none rounded-2xl px-5 py-4 focus:ring-2 focus:ring-primary focus:bg-white transition-all text-on-surface" />
+                            <input name="name" type="text" x-model="paymentForm.name" required placeholder="Contoh: Digital Wallet, Cash" class="w-full bg-surface-container-high border-none rounded-2xl px-5 py-4 focus:ring-2 focus:ring-primary focus:bg-white transition-all text-on-surface" />
                         </div>
                         <div class="flex items-center justify-between p-4 bg-surface-container-low rounded-2xl border border-transparent">
                             <div class="flex items-center gap-3">
@@ -343,13 +533,13 @@
                                 <p class="font-bold text-on-surface">Status Aktif</p>
                             </div>
                             <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" name="status" class="sr-only peer" checked />
+                                <input type="checkbox" name="status" class="sr-only peer" x-model="paymentForm.isActive" />
                                 <div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                             </label>
                         </div>
                         <div class="flex gap-4 pt-4">
                             <button type="button" @click="showPaymentModal = false" class="flex-1 py-4 rounded-2xl font-bold text-on-surface-variant hover:bg-surface-container-high transition-colors">Batal</button>
-                            <button type="submit" class="flex-1 py-4 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all active:scale-95">Simpan Data</button>
+                            <button type="submit" class="flex-1 py-4 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all active:scale-95" x-text="editPaymentMode ? 'Update Data' : 'Simpan Data'"></button>
                         </div>
                     </form>
                 </div>
@@ -365,33 +555,113 @@
                 <div class="p-8">
                     <div class="flex items-center justify-between mb-8">
                         <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-2xl bg-orange-100 flex items-center justify-center text-primary">
+                            <div class="w-12 h-12 rounded-2xl bg-orange-100 flex items-center justify-center text-orange-600">
                                 <span class="material-symbols-outlined">category</span>
                             </div>
-                            <h3 class="text-2xl font-bold">Kategori Menu</h3>
+                            <h3 class="text-2xl font-bold" x-text="editCategoryMode ? 'Edit Kategori Menu' : 'Kategori Menu'"></h3>
                         </div>
                         <button @click="showCategoryModal = false" class="w-10 h-10 rounded-full hover:bg-surface-container-high flex items-center justify-center transition-colors">
                             <span class="material-symbols-outlined">close</span>
                         </button>
                     </div>
-                    <form class="space-y-6">
+                    <form :action="editCategoryMode ? '<?= BASE_URL ?>/dashboard/settings/update-category-menu' : '<?= BASE_URL ?>/dashboard/settings/create-category-menu'" method="post" class="space-y-6">
+                        <input type="hidden" name="id" :value="categoryForm.id">
                         <div class="space-y-2">
                             <label class="block text-sm font-bold text-on-surface-variant ml-1">Nama Kategori</label>
-                            <input type="text" placeholder="Contoh: Makanan Utama, Minuman" class="w-full bg-surface-container-high border-none rounded-2xl px-5 py-4 focus:ring-2 focus:ring-primary focus:bg-white transition-all text-on-surface" />
+                            <input name="name" type="text" x-model="categoryForm.name" required placeholder="Contoh: Makanan Utama, Minuman" class="w-full bg-surface-container-high border-none rounded-2xl px-5 py-4 focus:ring-2 focus:ring-primary focus:bg-white transition-all text-on-surface" />
                         </div>
                         <div class="space-y-2">
-                            <label class="block text-sm font-bold text-on-surface-variant ml-1">Deskripsi Singkat</label>
-                            <textarea rows="3" placeholder="Jelaskan kategori ini..." class="w-full bg-surface-container-high border-none rounded-2xl px-5 py-4 focus:ring-2 focus:ring-primary focus:bg-white transition-all text-on-surface resize-none"></textarea>
+                            <label class="block text-sm font-bold text-on-surface-variant ml-1">Deskripsi</label>
+                            <textarea name="description" x-model="categoryForm.description" required rows="3" placeholder="Jelaskan kategori ini..." class="w-full bg-surface-container-high border-none rounded-2xl px-5 py-4 focus:ring-2 focus:ring-primary focus:bg-white transition-all text-on-surface resize-none"></textarea>
                         </div>
                         <div class="flex gap-4 pt-4">
                             <button type="button" @click="showCategoryModal = false" class="flex-1 py-4 rounded-2xl font-bold text-on-surface-variant hover:bg-surface-container-high transition-colors">Batal</button>
-                            <button type="submit" class="flex-1 py-4 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all active:scale-95">Simpan Kategori</button>
+                            <button type="submit" class="flex-1 py-4 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all active:scale-95" x-text="editCategoryMode ? 'Update Data' : 'Simpan Data'"></button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </template>
+
+    <!-- Employee Modal -->
+    <template x-teleport="body">
+        <div x-show="showEmployeeModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div x-show="showEmployeeModal" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="showEmployeeModal = false"></div>
+            <div x-show="showEmployeeModal" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95 translate-y-8" x-transition:enter-end="opacity-100 scale-100 translate-y-0" class="relative bg-surface-container-lowest w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/20">
+                <div class="p-8">
+                    <div class="flex items-center justify-between mb-8">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-2xl bg-blue-100 flex items-center justify-center text-blue-600">
+                                <span class="material-symbols-outlined">badge</span>
+                            </div>
+                            <h3 class="text-2xl font-bold" x-text="editEmployeeMode ? 'Edit Data Karyawan' : 'Tambah Karyawan Baru'"></h3>
+                        </div>
+                        <button @click="showEmployeeModal = false" class="w-10 h-10 rounded-full hover:bg-surface-container-high flex items-center justify-center transition-colors">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+                    <form :action="editEmployeeMode ? '<?= BASE_URL ?>/dashboard/settings/update-employee' : '<?= BASE_URL ?>/dashboard/settings/create-employee'" method="post" class="space-y-4">
+                        <input type="hidden" name="id" :value="employeeForm.id">
+
+                        <div class="space-y-1">
+                            <label class="block text-sm font-bold text-on-surface-variant ml-1">Nama Lengkap</label>
+                            <input name="name" type="text" x-model="employeeForm.name" required placeholder="Nama karyawan..." class="w-full bg-surface-container-high border-none rounded-2xl px-5 py-3 focus:ring-2 focus:ring-primary focus:bg-white transition-all text-on-surface" />
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-1">
+                                <label class="block text-sm font-bold text-on-surface-variant ml-1">Username</label>
+                                <input name="username" type="text" x-model="employeeForm.username" required placeholder="username" class="w-full bg-surface-container-high border-none rounded-2xl px-5 py-3 focus:ring-2 focus:ring-primary focus:bg-white transition-all text-on-surface" />
+                            </div>
+                            <div class="space-y-1">
+                                <label class="block text-sm font-bold text-on-surface-variant ml-1">Role</label>
+                                <select name="role_id" x-model="employeeForm.role_id" required class="w-full bg-surface-container-high border-none rounded-2xl px-5 py-3 focus:ring-2 focus:ring-primary focus:bg-white transition-all text-on-surface">
+                                    <option value="" disabled>Pilih Role</option>
+                                    <?php foreach ($roles as $role): ?>
+                                        <option value="<?= $role->id ?>"><?= htmlspecialchars($role->name) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="block text-sm font-bold text-on-surface-variant ml-1" x-text="editEmployeeMode ? 'Password (Kosongkan jika tidak diubah)' : 'Password'"></label>
+                            <input name="password" type="password" :required="!editEmployeeMode" placeholder="••••••••" class="w-full bg-surface-container-high border-none rounded-2xl px-5 py-3 focus:ring-2 focus:ring-primary focus:bg-white transition-all text-on-surface" />
+                        </div>
+
+                        <div class="flex items-center justify-between p-4 bg-surface-container-low rounded-2xl border border-transparent">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-secondary">verified</span>
+                                <p class="font-bold text-on-surface">Status Akun</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="status" class="sr-only peer" x-model="employeeForm.isActive" />
+                                <div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            </label>
+                        </div>
+
+                        <div class="flex gap-4 pt-4">
+                            <button type="button" @click="showEmployeeModal = false" class="flex-1 py-4 rounded-2xl font-bold text-on-surface-variant hover:bg-surface-container-high transition-colors">Batal</button>
+                            <button type="submit" class="flex-1 py-4 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all active:scale-95" x-text="editEmployeeMode ? 'Update Akun' : 'Simpan Akun'"></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </template>
+    <script>
+        function previewLogo(event) {
+            if (event.target.files && event.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function() {
+                    const output = document.getElementById('logo-preview');
+                    output.src = reader.result;
+                }
+                reader.readAsDataURL(event.target.files[0]);
+            }
+        }
+    </script>
     <?php include 'partials/includes/js.php'; ?>
 </body>
 

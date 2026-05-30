@@ -395,3 +395,144 @@ h1, h2, h3 {
   font-size: 0.75rem;
   color: #a8a29e;
 }
+
+/* QR Code Payment Section */
+.payment-qr-section {
+  background: var(--surface-container-low);
+  border-radius: 2rem;
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.payment-qr-badge {
+  margin-bottom: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  background-color: rgba(46, 106, 58, 0.1);
+  border: 1px solid rgba(46, 106, 58, 0.15);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-full);
+}
+
+.payment-qr-badge .dot-indicator {
+  width: 0.625rem;
+  height: 0.625rem;
+  background-color: var(--secondary);
+  border-radius: var(--radius-full);
+  margin-right: 0.75rem;
+}
+
+.payment-qr-badge .badge-text {
+  color: var(--secondary);
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.section-label {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  color: var(--on-surface);
+}
+
+.qr-desc {
+  font-size: 0.875rem;
+  color: var(--on-surface-variant);
+  margin-bottom: 2rem;
+  max-width: 360px;
+}
+
+/* Premium QR Card Container - Static for Compatibility */
+.payment-qr-card {
+  position: relative;
+  width: fit-content;
+  margin-bottom: 2rem;
+}
+
+.payment-qr-card-glow {
+  display: none;
+}
+
+.payment-qr-card-inner {
+  position: relative;
+  background: var(--surface-container-lowest);
+  padding: 2rem;
+  border-radius: 2rem;
+  box-shadow: 0 16px 48px -8px rgba(196, 73, 0, 0.16);
+  border: 1px solid rgba(224, 192, 179, 0.25);
+  z-index: 2;
+}
+
+.qr-image {
+  border-radius: var(--radius-xl);
+  opacity: 1;
+  filter: none;
+  display: block;
+}
+
+.qr-icons-hint {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  opacity: 0.6;
+  color: var(--on-surface-variant);
+}
+
+/* Two Column Details Grid */
+.qr-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 380px;
+  margin-top: 0.5rem;
+  border-top: 1px solid rgba(224, 192, 179, 0.15);
+  padding-top: 1.5rem;
+  text-align: left;
+}
+
+.detail-col-right {
+  text-align: right;
+}
+
+.qr-detail-label {
+  display: block;
+  font-size: 0.625rem;
+  font-weight: 800;
+  color: var(--on-surface-variant);
+  opacity: 0.6;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+
+.qr-detail-value {
+  font-size: 1.125rem;
+  font-weight: 800;
+}
+
+.qr-detail-value.ref-code {
+  color: var(--primary);
+  font-family: 'Plus Jakarta Sans', monospace;
+  letter-spacing: 0.05em;
+  user-select: all;
+}
+
+/* Animations */
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.15); }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+

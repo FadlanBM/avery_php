@@ -1,100 +1,247 @@
+<?php
+// Order Tracking View
+$order = $order ?? null;
+$orderItems = $orderItems ?? [];
+$orderIdFormatted = 'ORD-' . str_pad($order['id'] ?? 0, 6, '0', STR_PAD_LEFT);
+$status = $order['status'] ?? 'pending';
+$tableNumber = $order['nomor_meja'] ?? 'T12';
+?>
 <!DOCTYPE html>
 <html lang="id">
 
-<?php require_once __DIR__ . '/includes/navbar.php'; ?>
+<?php require_once __DIR__ . '/includes/header.php'; ?>
+<link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/order_tracking.css">
 
 <body class="page-shell font-body">
   <nav class="navbar">
     <div class="nav-container">
       <div class="nav-wrapper">
-        <div class="brand-logo">Sensory Hearth</div>
+        <a href="<?= BASE_URL ?>/menu" class="brand-logo">Saffron & Sage</a>
         <nav class="nav-links">
-          <a class="nav-item" href="/">Menu</a>
-          <a class="nav-item" href="#" class="active">Riwayat</a>
+          <a class="nav-item" href="<?= BASE_URL ?>/menu">Menu</a>
+          <a class="nav-item" href="<?= BASE_URL ?>/history">Riwayat</a>
           <a class="nav-item" href="#">Bantuan</a>
         </nav>
         <div class="nav-actions">
+          <div class="table-badge">
+            <span class="material-symbols-outlined">table_restaurant</span>
+            Meja <?= htmlspecialchars($tableNumber) ?>
+          </div>
           <a href="/cart" class="action-icon">
             <span class="material-symbols-outlined">shopping_bag</span>
           </a>
-          <div class="action-icon">
-            <span class="material-symbols-outlined">account_circle</span>
-          </div>
         </div>
       </div>
     </div>
   </nav>
 
   <main class="page-container">
-    <div class="status-icon-container">
-      <div class="status-main-icon">
-        <span class="material-symbols-outlined">restaurant</span>
+    <?php if ($status === 'cancelled'): ?>
+      <div class="status-icon-container">
+        <div class="status-main-icon" style="background-color: var(--error-container); color: var(--error);">
+          <span class="material-symbols-outlined">cancel</span>
+        </div>
       </div>
-    </div>
-
-    <header class="status-header">
-      <h1 class="status-title">Status Pesanan</h1>
-      <p class="status-subtitle">Harap tunggu sebentar, koki kami sedang menyiapkan hidangan Anda.</p>
-    </header>
+      <header class="status-header">
+        <h1 class="status-title">Pesanan Dibatalkan</h1>
+        <p class="status-subtitle">Mohon maaf, pesanan Anda telah dibatalkan oleh restoran.</p>
+      </header>
+    <?php elseif ($status === 'completed'): ?>
+      <div class="status-icon-container">
+        <div class="status-main-icon" style="background-color: #c8e6c9; color: #2e7d32;">
+          <span class="material-symbols-outlined">task_alt</span>
+        </div>
+      </div>
+      <header class="status-header">
+        <h1 class="status-title">Pesanan Selesai</h1>
+        <p class="status-subtitle">Terima kasih atas pesanan Anda! Semoga Anda menikmati hidangan kami.</p>
+      </header>
+    <?php else: ?>
+      <div class="status-icon-container">
+        <div class="status-main-icon">
+          <span class="material-symbols-outlined">restaurant</span>
+        </div>
+      </div>
+      <header class="status-header">
+        <h1 class="status-title">Status Pesanan</h1>
+        <p class="status-subtitle">Harap tunggu sebentar, koki kami sedang menyiapkan hidangan Anda.</p>
+      </header>
+    <?php endif; ?>
 
     <div class="order-info-card">
       <div class="info-grid">
         <div class="info-item">
           <label class="info-label">NOMOR PESANAN</label>
-          <div class="info-value">ORD-240325-1021</div>
+          <div class="info-value"><?= htmlspecialchars($orderIdFormatted) ?></div>
         </div>
         <div class="info-item text-right">
           <label class="info-label">NOMOR MEJA</label>
-          <div class="info-value text-primary">Meja T12</div>
+          <div class="info-value text-primary">Meja <?= htmlspecialchars($tableNumber) ?></div>
         </div>
       </div>
       <div class="eta-badge">
         <span class="material-symbols-outlined">schedule</span>
         <span>Estimasi Penyajian</span>
-        <span class="eta-time">10 - 15 menit</span>
+        <span class="eta-time">
+          <?php
+          if ($status === 'pending' || $status === 'confirmed') {
+              echo '15 - 20 menit';
+          } elseif ($status === 'preparing') {
+              echo '10 - 15 menit';
+          } elseif ($status === 'ready') {
+              echo 'Siap saji';
+          } else {
+              echo 'Selesai';
+          }
+          ?>
+        </span>
       </div>
     </div>
 
+    <!-- Payment QR Code for Cash payments -->
+    <?php if (!empty($order['payment_code'])): ?>
+      <div class="payment-qr-section">
+        <div class="payment-qr-badge">
+          <span class="dot-indicator"></span>
+          <span class="badge-text">Menunggu Pembayaran</span>
+        </div>
+        <h2 class="section-label">Kode Pembayaran Tunai</h2>
+        <p class="qr-desc">Tunjukkan QR Code atau Kode Referensi ini ke kasir untuk menyelesaikan transaksi.</p>
+        
+        <!-- Static QR Container for Maximum Compatibility -->
+        <div class="payment-qr-card" id="payment-qr-card">
+          <div class="payment-qr-card-inner">
+            <img
+              src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=<?= urlencode($order['payment_code']) ?>"
+              alt="QR Code Pembayaran"
+              class="qr-image"
+              width="250"
+              height="250"
+            >
+            <div class="qr-icons-hint">
+              <span class="material-symbols-outlined text-2xl">account_balance_wallet</span>
+              <span class="material-symbols-outlined text-2xl">qr_code_scanner</span>
+              <span class="material-symbols-outlined text-2xl">contactless</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Two Column Details Grid -->
+        <div class="qr-details-grid">
+          <div>
+            <span class="qr-detail-label">Kode Referensi</span>
+            <span class="qr-detail-value ref-code"><?= htmlspecialchars($order['payment_code']) ?></span>
+          </div>
+          <div class="detail-col-right">
+            <span class="qr-detail-label">Total Tagihan</span>
+            <span class="qr-detail-value">Rp <?= number_format($order['total_amount'], 0, ',', '.') ?></span>
+          </div>
+        </div>
+      </div>
+    <?php endif; ?>
+
+    <!-- Timeline -->
+    <?php if ($status !== 'cancelled'): ?>
     <div class="timeline-container">
-      <div class="timeline-item completed">
+      <!-- Step 1: Diterima -->
+      <?php
+      $step1Class = 'pending';
+      if ($status === 'pending' || $status === 'confirmed') {
+          $step1Class = 'active';
+      } elseif (in_array($status, ['preparing', 'ready', 'completed'])) {
+          $step1Class = 'completed';
+      }
+      ?>
+      <div class="timeline-item <?= $step1Class ?>">
         <div class="timeline-status">
           <div class="status-circle">
             <span class="material-symbols-outlined">check</span>
           </div>
         </div>
         <div class="timeline-content">
-          <h3 class="timeline-title">Diterima</h3>
-          <p class="timeline-desc">Pesanan Anda telah kami terima dan masuk antrean.</p>
-          <span class="timeline-time">12:48 PM</span>
+          <h3 class="timeline-title">Pesanan Diterima</h3>
+          <p class="timeline-desc">Pesanan Anda telah kami terima dan menunggu konfirmasi kasir.</p>
+          <?php if ($step1Class === 'active'): ?>
+            <span class="active-badge">PROSES KONFIRMASI</span>
+          <?php endif; ?>
         </div>
       </div>
 
-      <div class="timeline-item active">
-        <div class="timeline-status">
-          <div class="status-circle"></div>
-        </div>
-        <div class="timeline-content">
-          <h3 class="timeline-title">Sedang Diproses</h3>
-          <p class="timeline-desc">Koki kami sedang meracik bumbu dan memasak hidangan.</p>
-          <span class="active-badge">SEDANG BERLANGSUNG</span>
-        </div>
-      </div>
-
-      <div class="timeline-item pending">
+      <!-- Step 2: Sedang Diproses -->
+      <?php
+      $step2Class = 'pending';
+      if ($status === 'preparing') {
+          $step2Class = 'active';
+      } elseif (in_array($status, ['ready', 'completed'])) {
+          $step2Class = 'completed';
+      }
+      ?>
+      <div class="timeline-item <?= $step2Class ?>">
         <div class="timeline-status">
           <div class="status-circle">
-            <span class="material-symbols-outlined">restaurant_menu</span>
+            <?php if ($step2Class === 'completed'): ?>
+              <span class="material-symbols-outlined">check</span>
+            <?php else: ?>
+              <span class="material-symbols-outlined">soup_kitchen</span>
+            <?php endif; ?>
           </div>
         </div>
         <div class="timeline-content">
-          <h3 class="timeline-title">Diantar ke Meja</h3>
-          <p class="timeline-desc">Hidangan hangat akan segera meluncur ke Meja T12.</p>
+          <h3 class="timeline-title">Sedang Diproses</h3>
+          <p class="timeline-desc">Koki kami sedang memasak dan meracik bumbu hidangan Anda.</p>
+          <?php if ($step2Class === 'active'): ?>
+            <span class="active-badge">SEDANG BERLANGSUNG</span>
+          <?php endif; ?>
+        </div>
+      </div>
+
+      <!-- Step 3: Siap Disajikan -->
+      <?php
+      $step3Class = 'pending';
+      if ($status === 'ready') {
+          $step3Class = 'active';
+      } elseif ($status === 'completed') {
+          $step3Class = 'completed';
+      }
+      ?>
+      <div class="timeline-item <?= $step3Class ?>">
+        <div class="timeline-status">
+          <div class="status-circle">
+            <?php if ($step3Class === 'completed'): ?>
+              <span class="material-symbols-outlined">check</span>
+            <?php else: ?>
+              <span class="material-symbols-outlined">restaurant_menu</span>
+            <?php endif; ?>
+          </div>
+        </div>
+        <div class="timeline-content">
+          <h3 class="timeline-title">Siap Disajikan</h3>
+          <p class="timeline-desc">Hidangan hangat siap diantar ke meja makan Anda.</p>
+          <?php if ($step3Class === 'active'): ?>
+            <span class="active-badge">SIAP DIANTAR</span>
+          <?php endif; ?>
+        </div>
+      </div>
+
+      <!-- Step 4: Selesai -->
+      <?php $step4Class = ($status === 'completed') ? 'completed' : 'pending'; ?>
+      <div class="timeline-item <?= $step4Class ?>">
+        <div class="timeline-status">
+          <div class="status-circle">
+            <span class="material-symbols-outlined">sports_bar</span>
+          </div>
+        </div>
+        <div class="timeline-content">
+          <h3 class="timeline-title">Selesai</h3>
+          <p class="timeline-desc">Selamat menikmati makanan! Silakan bayar ke kasir setelah bersantap.</p>
         </div>
       </div>
     </div>
+    <?php endif; ?>
 
+    <!-- Action Buttons -->
     <div class="action-buttons">
-      <a href="/menu" class="btn-primary inline-flex items-center justify-center gap-2 shadow-soft transition hover:-translate-y-0.5">
+      <a href="<?= BASE_URL ?>/menu" class="btn-primary inline-flex items-center justify-center gap-2 shadow-soft transition hover:-translate-y-0.5">
         <span class="material-symbols-outlined">shopping_cart</span>
         Pesan Menu Lain
       </a>
@@ -104,9 +251,36 @@
       </button>
     </div>
 
-    <p class="auto-refresh-text">Halaman ini akan diperbarui secara otomatis</p>
+    <p class="auto-refresh-text">Halaman ini diperbarui secara otomatis tiap 5 detik</p>
   </main>
   <?php require_once __DIR__ . '/includes/footer.php'; ?>
+
+  <?php if ($order && $status !== 'completed' && $status !== 'cancelled'): ?>
+    <script>
+      const orderId = <?= (int) $order['id'] ?>;
+      const BASE_URL = '<?= BASE_URL ?>';
+      const currentStatus = '<?= $status ?>';
+
+      async function checkOrderStatus() {
+        try {
+          const response = await fetch(BASE_URL + '/order/status?order_id=' + orderId);
+          const data = await response.json();
+          
+          if (data.success && data.status) {
+            if (data.status !== currentStatus) {
+              window.location.reload();
+            }
+          }
+        } catch (err) {
+          console.error('Error polling status:', err);
+        }
+      }
+
+      // Poll status every 5 seconds
+      setInterval(checkOrderStatus, 5000);
+
+    </script>
+  <?php endif; ?>
 </body>
 
 </html>

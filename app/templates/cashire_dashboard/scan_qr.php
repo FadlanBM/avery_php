@@ -10,11 +10,11 @@
     <?php $activeMenu = 'scanqr'; ?>
     <?php include 'partials/includes/navbarslider.php'; ?>
     <!-- Main Content Area -->
-    <main class="flex-1 flex flex-col relative overflow-y-auto overflow-x-hidden">
+    <main class="flex-1 min-w-0 lg:ml-64 flex flex-col relative overflow-y-auto overflow-x-hidden">
       <!-- TopNavBar Component (Shared Logic) -->
       <?php $pageTitle = 'Scan QR'; ?>
       <?php include 'partials/includes/topheader.php'; ?>
-      <div class="flex-1 p-4 sm:p-6 md:p-8 lg:p-12 max-w-6xl mx-auto w-full overflow-x-hidden">
+      <div class="flex-1 p-4 sm:p-6 md:p-8 lg:p-10 xl:p-12 max-w-6xl mx-auto w-full overflow-x-hidden">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-start min-w-0">
           <!-- Viewfinder & Scanning Section -->
           <div class="lg:col-span-7 space-y-6 lg:space-y-8 min-w-0">
@@ -25,11 +25,12 @@
               <div class="relative bg-surface-container-low rounded-2xl sm:rounded-[2rem] p-3 sm:p-4 shadow-sm overflow-hidden">
                 <div class="aspect-square w-full max-w-md mx-auto bg-stone-900 rounded-xl sm:rounded-[1.5rem] relative overflow-hidden flex items-center justify-center">
                   <!-- Camera Stream Placeholder -->
-                  <div class="absolute inset-0 opacity-40 mix-blend-overlay">
+                  <div id="scanner-placeholder" class="absolute inset-0 opacity-40 mix-blend-overlay">
                     <img alt="Background texture" class="w-full h-full object-cover grayscale" data-alt="abstract blurred view of a high-end restaurant kitchen with warm lighting and motion of chefs in white coats" src="<?= BASE_URL ?>/assets/images/employee_dashboard/kitchen_texture.jpg" />
                   </div>
+                  <div id="qr-reader" class="absolute inset-0 z-0 hidden"></div>
                   <!-- QR Framing UI -->
-                  <div class="relative z-10 w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 border-2 border-white/20 rounded-2xl sm:rounded-3xl flex items-center justify-center">
+                  <div class="pointer-events-none relative z-10 w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 border-2 border-white/20 rounded-2xl sm:rounded-3xl flex items-center justify-center">
                     <!-- Corners -->
                     <div class="absolute top-0 left-0 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 border-t-4 border-l-4 border-primary rounded-tl-lg sm:rounded-tl-xl -mt-1 -ml-1"></div>
                     <div class="absolute top-0 right-0 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 border-t-4 border-r-4 border-primary rounded-tr-lg sm:rounded-tr-xl -mt-1 -mr-1"></div>
@@ -37,12 +38,12 @@
                     <div class="absolute bottom-0 right-0 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 border-b-4 border-r-4 border-primary rounded-br-lg sm:rounded-br-xl -mb-1 -mr-1"></div>
                     <!-- Scanning Animation Line -->
                     <div class="absolute w-full h-0.5 bg-primary/60 top-1/2 -translate-y-1/2 blur-[2px] shadow-[0_0_15px_#9c3800]"></div>
-                    <span class="material-symbols-outlined text-white/40 text-4xl sm:text-5xl md:text-6xl" data-icon="qr_code_2">qr_code_2</span>
+                    <span id="scanner-icon" class="material-symbols-outlined text-white/40 text-4xl sm:text-5xl md:text-6xl" data-icon="qr_code_2">qr_code_2</span>
                   </div>
                   <div class="absolute bottom-4 sm:bottom-6 md:bottom-8 left-0 right-0 text-center">
                     <span class="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-black/40 backdrop-blur-md rounded-full text-white text-xs sm:text-sm font-headline tracking-wide">
-                      <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-                      Camera Active
+                      <span id="scanner-dot" class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                      <span id="scanner-status">Menyalakan kamera...</span>
                     </span>
                   </div>
                 </div>
@@ -62,17 +63,20 @@
                 <p class="text-xs sm:text-sm text-on-surface-variant">Gunakan jika QR Code tidak terbaca atau rusak.</p>
               </div>
               <div class="space-y-4">
+                <form id="manual-order-form" class="space-y-4">
                 <div class="space-y-2">
                   <label class="block text-xs font-headline font-bold uppercase tracking-widest text-outline">ID Pesanan</label>
                   <div class="relative">
-                    <input class="w-full h-12 sm:h-14 bg-surface-container-high border-0 rounded-xl px-4 font-headline text-on-surface focus:ring-2 focus:ring-primary/20 placeholder:text-outline/50 transition-all text-sm sm:text-base" placeholder="Contoh: ORDER-88921" type="text" />
+                    <input id="manual-order-input" class="w-full h-12 sm:h-14 bg-surface-container-high border-0 rounded-xl px-4 font-headline text-on-surface focus:ring-2 focus:ring-primary/20 placeholder:text-outline/50 transition-all text-sm sm:text-base" placeholder="Contoh: ORDER-88921" type="text" />
                     <span class="absolute right-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline/40" data-icon="tag">tag</span>
                   </div>
+                  <p id="scan-result" class="hidden text-xs font-medium text-outline break-all"></p>
                 </div>
-                <button class="w-full h-12 sm:h-14 bg-primary text-on-primary rounded-xl font-headline font-extrabold text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 transition-all hover:shadow-lg hover:shadow-primary/10 active:scale-[0.97]">
+                <button type="submit" class="w-full h-12 sm:h-14 bg-primary text-on-primary rounded-xl font-headline font-extrabold text-sm sm:text-base tracking-wide flex items-center justify-center gap-2 transition-all hover:shadow-lg hover:shadow-primary/10 active:scale-[0.97]">
                   Cari Pesanan
                   <span class="material-symbols-outlined" data-icon="search">search</span>
                 </button>
+                </form>
               </div>
             </section>
             <!-- Instructional / Guide Bento -->
@@ -98,6 +102,179 @@
       </footer>
     </main>
   </div>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const paymentUrl = '<?= BASE_URL ?>/employee-dashboard/pembayaran-tunai';
+      const readerId = 'qr-reader';
+      const reader = document.getElementById(readerId);
+      const placeholder = document.getElementById('scanner-placeholder');
+      const statusLabel = document.getElementById('scanner-status');
+      const statusDot = document.getElementById('scanner-dot');
+      const scannerIcon = document.getElementById('scanner-icon');
+      const resultLabel = document.getElementById('scan-result');
+      const manualForm = document.getElementById('manual-order-form');
+      const manualInput = document.getElementById('manual-order-input');
+
+      let html5QrCode = null;
+      let isScanning = false;
+      let hasResult = false;
+
+      const setStatus = (message, state = 'active') => {
+        statusLabel.textContent = message;
+        statusDot.className = 'w-2 h-2 rounded-full ' + (
+          state === 'error' ? 'bg-error' : state === 'success' ? 'bg-secondary' : 'bg-primary animate-pulse'
+        );
+      };
+
+      const showResult = (message, isError = false) => {
+        resultLabel.textContent = message;
+        resultLabel.classList.remove('hidden', 'text-error', 'text-outline', 'text-secondary');
+        resultLabel.classList.add(isError ? 'text-error' : 'text-secondary');
+      };
+
+      const normalizeOrderCode = (value) => value.trim().replace(/\s+/g, '');
+
+      const getRedirectUrl = (decodedText) => {
+        const value = normalizeOrderCode(decodedText);
+
+        if (!value) {
+          return null;
+        }
+
+        try {
+          const url = new URL(value, window.location.origin);
+
+          if (url.origin === window.location.origin) {
+            return url.toString();
+          }
+        } catch (error) {
+          // QR berisi kode order biasa, bukan URL.
+        }
+
+        return `${paymentUrl}?order_id=${encodeURIComponent(value)}`;
+      };
+
+      const stopCamera = async () => {
+        if (!html5QrCode || !isScanning) {
+          return;
+        }
+
+        try {
+          await html5QrCode.stop();
+        } catch (error) {
+          console.log(error);
+        } finally {
+          isScanning = false;
+          reader.classList.add('hidden');
+          placeholder.classList.remove('hidden');
+          scannerIcon.classList.remove('hidden');
+        }
+      };
+
+      const handleScan = async (decodedText) => {
+        if (hasResult) {
+          return;
+        }
+
+        const redirectUrl = getRedirectUrl(decodedText);
+
+        if (!redirectUrl) {
+          showResult('QR tidak valid. Coba arahkan ulang kode pelanggan.', true);
+          return;
+        }
+
+        hasResult = true;
+        setStatus('QR terdeteksi', 'success');
+        showResult(`Hasil scan: ${decodedText}`);
+        await stopCamera();
+
+        window.setTimeout(() => {
+          window.location.href = redirectUrl;
+        }, 450);
+      };
+
+      const startCamera = async () => {
+        if (!window.Html5Qrcode) {
+          setStatus('Scanner belum tersedia', 'error');
+          showResult('Library scanner gagal dimuat. Periksa koneksi internet lalu muat ulang halaman.', true);
+          return;
+        }
+
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          setStatus('Kamera tidak didukung', 'error');
+          showResult('Gunakan browser modern dan akses halaman melalui HTTPS atau localhost.', true);
+          return;
+        }
+
+        try {
+          setStatus('Meminta izin kamera...');
+          reader.classList.remove('hidden');
+          html5QrCode = new Html5Qrcode(readerId);
+          isScanning = true;
+
+          await html5QrCode.start(
+            { facingMode: 'environment' },
+            {
+              fps: 10,
+              qrbox: {
+                width: 250,
+                height: 250
+              }
+            },
+            handleScan,
+            () => {}
+          );
+
+          reader.classList.remove('hidden');
+          placeholder.classList.add('hidden');
+          scannerIcon.classList.add('hidden');
+          setStatus('Kamera aktif');
+        } catch (error) {
+          isScanning = false;
+          reader.classList.add('hidden');
+          placeholder.classList.remove('hidden');
+          scannerIcon.classList.remove('hidden');
+          setStatus('Gagal membuka kamera', 'error');
+
+          if (error?.name === 'NotAllowedError') {
+            showResult('Izin kamera ditolak. Izinkan akses kamera di pengaturan browser.', true);
+          } else if (error?.name === 'NotFoundError') {
+            showResult('Kamera tidak ditemukan pada perangkat ini.', true);
+          } else {
+            showResult('Pastikan halaman dibuka melalui HTTPS atau localhost, lalu coba muat ulang.', true);
+          }
+        }
+      };
+
+      manualForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        const redirectUrl = getRedirectUrl(manualInput.value);
+
+        if (!redirectUrl) {
+          manualInput.focus();
+          showResult('Masukkan ID pesanan terlebih dahulu.', true);
+          return;
+        }
+
+        showResult(`Membuka pesanan: ${manualInput.value}`);
+        window.location.href = redirectUrl;
+      });
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          stopCamera();
+        }
+      });
+
+      window.addEventListener('beforeunload', () => {
+        stopCamera();
+      });
+
+      startCamera();
+    });
+  </script>
 </body>
 
 </html>

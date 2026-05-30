@@ -30,12 +30,44 @@ $menuItems = [
         <?php endforeach; ?>
     </div>
     <div class="mt-auto pt-6 border-t border-stone-200 dark:border-stone-800">
-        <div class="flex items-center gap-3 px-2">
-            <img alt="Admin Avatar" class="w-10 h-10 rounded-full object-cover" src="<?php echo BASE_URL; ?>/assets/images/admin/avatar_julian.jpg" />
-            <div class="overflow-hidden">
-                <p class="text-sm font-bold truncate">Chef Julian</p>
-                <p class="text-xs text-stone-500">Executive Admin</p>
+        <div class="flex items-center justify-between px-2">
+            <div class="flex items-center gap-3 overflow-hidden">
+                <img alt="Admin Avatar" class="w-10 h-10 rounded-full object-cover" src="<?php echo BASE_URL; ?>/assets/images/admin/avatar_julian.jpg" />
+                <div class="overflow-hidden">
+                    <p class="text-sm font-bold truncate">Chef Julian</p>
+                    <p class="text-xs text-stone-500">Executive Admin</p>
+                </div>
             </div>
+            <button type="button" onclick="confirmLogout()" class="text-stone-500 hover:text-red-600 transition-colors p-2 rounded-xl hover:bg-stone-200/50 dark:hover:bg-stone-850 flex items-center justify-center" title="Keluar">
+                <span class="material-symbols-outlined">logout</span>
+            </button>
         </div>
     </div>
 </nav>
+
+<script>
+function confirmLogout() {
+    Swal.fire({
+        title: 'Keluar Portal?',
+        text: 'Apakah Anda yakin ingin keluar dari Management Portal Saffron & Sage?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#9c3800',
+        cancelButtonColor: '#594238',
+        confirmButtonText: 'Ya, Keluar!',
+        cancelButtonText: 'Batal',
+        background: '#fef8f1',
+        color: '#1d1b17',
+        borderRadius: '1.5rem',
+        customClass: {
+            popup: 'rounded-[2rem] p-8 shadow-2xl border border-white/20',
+            confirmButton: 'rounded-xl px-6 py-3 font-bold transition-all hover:scale-105 active:scale-95',
+            cancelButton: 'rounded-xl px-6 py-3 font-bold transition-all hover:scale-105 active:scale-95'
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = '<?= BASE_URL ?>/logout';
+        }
+    });
+}
+</script>
